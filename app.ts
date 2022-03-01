@@ -10,4 +10,6 @@ app.get('/', (req, res) => res.send('Homepage'));
 app.use('/api/notes', notesRouter);
 app.get('*', (req, res) => res.sendStatus(404));
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(port, () =>
+  console.log(`Server running on port ${port}`),
+);

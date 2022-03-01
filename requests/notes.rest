@@ -4,19 +4,16 @@
 GET {{url}}{{notes}}
 
 ###
-
 GET {{url}}{{notes}}/2
 
 ###
-
 POST {{url}}{{notes}}
 Content-Type: application/json
 
 {
-  "content": "a",
-  "important": false
+  "content": "Keep coding",
+  "important": true
 }
 
 ###
-
 DELETE {{url}}{{notes}}/4
