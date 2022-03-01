@@ -5,8 +5,5 @@ export default interface NoteInterface {
   important: boolean;
 }
 
-export function isNote(object: any): object is NoteInterface {
-  return (
-    typeof object.content === 'string' && typeof object.important === 'boolean'
-  );
-}
+export const isNote = (object: any): object is NoteInterface =>
+  typeof object.content === 'string' && typeof object.important === 'boolean';

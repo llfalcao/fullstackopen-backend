@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import personService from '../services/persons';
-import PersonInterface from '../models/Person';
+import PersonInterface, {isPerson} from '../models/Person';
 
 const router = Router();
 
@@ -31,6 +31,11 @@ router.post('/', (req, res) => {
   personService.read().then((persons) => {
     const id = Math.floor(Math.random() * 1000);
     const person: PersonInterface = { id, name, number };
+
+    if (!isPerson(person)) {
+      return res.status(400).json({ error: 'invalid value type' });
+    }
+
     personService.save(persons.concat(person)).then(() => res.json(person));
   });
 });
