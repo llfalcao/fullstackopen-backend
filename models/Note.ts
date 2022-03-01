@@ -7,6 +7,6 @@ export default interface NoteInterface {
 
 export function isNote(object: any): object is NoteInterface {
   return (
-    typeof object.content === "string" && typeof object.important === "boolean"
+    typeof object.content === 'string' && typeof object.important === 'boolean'
   );
 }
