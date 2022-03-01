@@ -18,5 +18,6 @@
     "esbuild-runner": "^2.2.1",
     "nodemon": "^2.0.15",
     "typescript": "^4.5.5"
-  }
+  },
+  "keywords": []
 }
