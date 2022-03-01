@@ -12,7 +12,9 @@ const read = (): Promise<NoteInterface[]> => {
 
 const save = (notes: NoteInterface[]): Promise<void> => {
   return new Promise((resolve, reject) => {
-    fs.writeFile(filepath, JSON.stringify(notes, null, 2), () => resolve());
+    fs.writeFile(filepath, `${JSON.stringify(notes, null, 2)}\n`, () =>
+      resolve(),
+    );
   });
 };
 
