@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import personService from '../services/persons';
+import PersonInterface from '../models/Person';
 
 const router = Router();
 
@@ -15,6 +16,22 @@ router.get('/:id', (req, res) => {
     const person = persons.find((p) => p.id === Number(id));
     if (!person) return res.sendStatus(404);
     res.json(person);
+  });
+});
+
+// Create person
+router.post('/', (req, res) => {
+  const { name, number } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: 'name missing' });
+  }
+  if (!number) {
+    return res.status(400).json({ error: 'number missing' });
+  }
+  personService.read().then((persons) => {
+    const id = Math.floor(Math.random() * 1000);
+    const person: PersonInterface = { id, name, number };
+    personService.save(persons.concat(person)).then(() => res.json(person));
   });
 });
 
