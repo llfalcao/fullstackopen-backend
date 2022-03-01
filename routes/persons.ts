@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import personService from '../services/persons';
-import PersonInterface, {isPerson} from '../models/Person';
+import PersonInterface, { isPerson } from '../models/Person';
 
 const router = Router();
 
@@ -28,10 +28,15 @@ router.post('/', (req, res) => {
   if (!number) {
     return res.status(400).json({ error: 'number missing' });
   }
+
   personService.read().then((persons) => {
+    const isDuplicate = persons.some((p) => p.name === name);
+    if (isDuplicate) {
+      return res.status(409).json({ error: 'name must be unique' });
+    }
+
     const id = Math.floor(Math.random() * 1000);
     const person: PersonInterface = { id, name, number };
-
     if (!isPerson(person)) {
       return res.status(400).json({ error: 'invalid value type' });
     }
