@@ -18,4 +18,13 @@ router.get('/:id', (req, res) => {
   });
 });
 
+// Delete person
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  personService.read().then((persons) => {
+    const filteredPersons = persons.filter((p) => p.id !== Number(id));
+    personService.save(filteredPersons).then(() => res.sendStatus(204));
+  });
+});
+
 export default router;

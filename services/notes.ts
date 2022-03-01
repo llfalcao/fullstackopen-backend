@@ -11,11 +11,10 @@ const read = (): Promise<NoteInterface[]> => {
 };
 
 const save = (notes: NoteInterface[]): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(filepath, `${JSON.stringify(notes, null, 2)}\n`, () =>
-      resolve(),
-    );
-  });
+  const formattedJson = `${JSON.stringify(notes, null, 2)}\n`;
+  return new Promise((resolve, reject) =>
+    fs.writeFile(filepath, formattedJson, () => resolve()),
+  );
 };
 
 const noteService = { read, save };

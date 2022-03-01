@@ -12,5 +12,12 @@ const read = (): Promise<PersonInterface[]> => {
   );
 };
 
-const personService = { read };
+const save = (persons: PersonInterface[]): Promise<void> => {
+  const formattedJson = `${JSON.stringify(persons, null, 2)}\n`;
+  return new Promise((resolve, reject) =>
+    fs.writeFile(filepath, formattedJson, () => resolve()),
+  );
+};
+
+const personService = { read, save };
 export default personService;
