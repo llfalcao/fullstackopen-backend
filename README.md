@@ -1,3 +1,3 @@
 # fullstackopen-backend
 
-Created with CodeSandbox
+Backend projects from the [Full Stack Open]('https://fullstackopen.com/en') course.
