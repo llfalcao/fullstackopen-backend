@@ -2,3 +2,21 @@
 @persons = /api/persons
 
 GET {{url}}{{persons}}
+
+###
+POST {{url}}{{persons}}
+Content-Type: application/json
+
+{
+  "name": "Somebody",
+  "number": "555-123-4567"
+}
+
+###
+PUT {{url}}{{persons}}/100
+Content-Type: application/json
+
+{
+  "name": "Somebody",
+  "number": "555-987-6543"
+}
