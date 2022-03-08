@@ -1,22 +1,26 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import personService from '../services/persons';
-import PersonInterface, { isPerson } from '../models/Person';
+import { Person, isPerson } from '../models/Person';
+import { HydratedDocument, isValidObjectId } from 'mongoose';
 
 const router = Router();
 
 // Get all 'persons'
 router.get('/', (req, res) =>
-  personService.read().then((persons) => res.json(persons)),
+  personService.getAll().then((persons) => res.json(persons)),
 );
 
 // Get one person
 router.get('/:id', (req, res) => {
   const { id } = req.params;
-  personService.read().then((persons) => {
-    const person = persons.find((p) => p.id === Number(id));
-    if (!person) return res.sendStatus(404);
-    res.json(person);
-  });
+
+  if (!isValidObjectId(id)) {
+    return res.sendStatus(404);
+  }
+
+  personService
+    .get(id, null)
+    ?.then((person) => (person ? res.json(person) : res.sendStatus(404)));
 });
 
 const handleMissingInfo = (req: Request, res: Response, next: NextFunction) => {
@@ -41,23 +45,22 @@ const handleMissingInfo = (req: Request, res: Response, next: NextFunction) => {
 router.post('/', handleMissingInfo, (req, res) => {
   const { name, number } = req.body;
 
-  personService.read().then((persons) => {
-    const isDuplicate = persons.some((p) => p.name === name);
-    if (isDuplicate) {
+  if (!isPerson({ name, number })) {
+    return res.status(400).json({
+      error: 'invalid data type',
+    });
+  }
+
+  personService.get(null, name)?.then((person) => {
+    if (person && person.name === name) {
       return res.status(409).json({
         error: 'name must be unique',
       });
     }
 
-    const id = Math.floor(Math.random() * 1000);
-    const person: PersonInterface = { id, name, number };
-    if (!isPerson(person)) {
-      return res.status(400).json({
-        error: 'invalid value type',
-      });
-    }
-
-    personService.save(persons.concat(person)).then(() => res.json(person));
+    personService
+      .create({ name, number })
+      .then((createdPerson) => res.json(createdPerson));
   });
 });
 
@@ -66,28 +69,34 @@ router.put('/:id', handleMissingInfo, (req, res) => {
   const { id } = req.params;
   const { name, number } = req.body;
 
-  personService.read().then((persons) => {
-    const index = persons.findIndex((p) => p.id === Number(id));
-    if (!persons[index]) return res.sendStatus(404);
+  if (!isValidObjectId(id)) {
+    return res.sendStatus(404);
+  }
 
-    persons[index] = { ...persons[index], name, number };
+  if (!isPerson({ name, number })) {
+    return res.status(400).json({
+      error: 'invalid data type',
+    });
+  }
 
-    if (!isPerson(persons[index])) {
-      return res.status(400).json({
-        error: 'invalid value type',
-      });
-    }
-
-    personService.save(persons).then(() => res.json(persons[index]));
-  });
+  personService
+    .update(id, { name, number })
+    .then((updatedPerson) => res.json(updatedPerson));
 });
 
 // Delete person
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
-  personService.read().then((persons) => {
-    const filteredPersons = persons.filter((p) => p.id !== Number(id));
-    personService.save(filteredPersons).then(() => res.sendStatus(204));
+
+  if (!isValidObjectId(id)) {
+    return res.sendStatus(404);
+  }
+
+  personService.remove(id).then((result) => {
+    if (!result.acknowledged || result.deletedCount === 0) {
+      return res.sendStatus(404);
+    }
+    res.sendStatus(204);
   });
 });
 

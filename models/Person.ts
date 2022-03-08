@@ -1,8 +1,17 @@
-export default interface PersonInterface {
-  id: number;
+import { model, ObjectId, Schema } from 'mongoose';
+
+export interface Person {
+  _id: ObjectId;
   name: string;
   number: string;
 }
 
-export const isPerson = (object: any): object is PersonInterface =>
+const personSchema = new Schema({
+  name: String,
+  number: String,
+});
+
+export const PersonModel = model('Person', personSchema);
+
+export const isPerson = (object: any): object is Person =>
   typeof object.name === 'string' && typeof object.number === 'string';

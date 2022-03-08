@@ -1,23 +1,38 @@
-import path from 'path';
-import fs from 'fs';
-import PersonInterface from '../models/Person';
+import { PersonModel, Person } from '../models/Person';
+import { HydratedDocument, isValidObjectId } from 'mongoose';
 
-const filepath = path.resolve(process.cwd(), 'db/persons.json');
+const getAll = (): Promise<Person[]> =>
+  PersonModel.find({}).then((result) => result);
 
-const read = (): Promise<PersonInterface[]> => {
-  return new Promise((resolve, reject) =>
-    fs.readFile(filepath, 'utf8', (err, persons) =>
-      resolve(JSON.parse(persons)),
-    ),
-  );
+const get = (
+  id: string | null,
+  name: string | null,
+): Promise<Person> | null | undefined => {
+  if (id) {
+    return PersonModel.findById(id).then((result) => result);
+  } else if (name) {
+    return PersonModel.findOne({ name }).then((result) => result);
+  }
 };
 
-const save = (persons: PersonInterface[]): Promise<void> => {
-  const formattedJson = `${JSON.stringify(persons, null, 2)}\n`;
-  return new Promise((resolve, reject) =>
-    fs.writeFile(filepath, formattedJson, () => resolve()),
-  );
+const create = (personObject: {
+  name: string;
+  number: string;
+}): Promise<Person> => {
+  const person: HydratedDocument<Person> = new PersonModel({ ...personObject });
+  return person.save().then((result) => result);
 };
 
-const personService = { read, save };
+const update = (
+  id: string,
+  data: { name: string; number: string },
+): Promise<Person> =>
+  PersonModel.findOneAndUpdate({ _id: id }, data, { new: true }).then(
+    (result) => result,
+  );
+
+const remove = (id: string) =>
+  PersonModel.deleteOne({ _id: id }).then((result) => result);
+
+const personService = { getAll, get, create, update, remove };
 export default personService;

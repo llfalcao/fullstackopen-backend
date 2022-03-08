@@ -1,12 +1,17 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import { connect } from 'mongoose';
 import notesRouter from './routes/notes';
 import personRouter from './routes/persons';
 import infoRouter from './routes/info';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 const port = 8080;
+const mongoDbUrl = process.env.MONGODB!;
+connect(mongoDbUrl).catch((error) => console.log(error));
 
 app.use(cors());
 app.use(express.json());
