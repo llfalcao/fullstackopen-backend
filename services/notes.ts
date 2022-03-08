@@ -1,21 +1,20 @@
-import path from 'path';
-import fs from 'fs';
-import NoteInterface from '../models/Note';
+import { Note, NoteModel } from '../models/Note';
+import { HydratedDocument } from 'mongoose';
 
-const filepath = path.resolve(process.cwd(), 'db/notes.json');
+const getAll = (): Promise<Note[]> =>
+  NoteModel.find({}).then((result) => result);
 
-const read = (): Promise<NoteInterface[]> => {
-  return new Promise((resolve, reject) =>
-    fs.readFile(filepath, 'utf8', (err, notes) => resolve(JSON.parse(notes))),
-  );
-};
+const get = (id: string): Promise<Note> =>
+  NoteModel.findById(id).then((result) => result);
 
-const save = (notes: NoteInterface[]): Promise<void> => {
-  const formattedJson = `${JSON.stringify(notes, null, 2)}\n`;
-  return new Promise((resolve, reject) =>
-    fs.writeFile(filepath, formattedJson, () => resolve()),
-  );
-};
+const create = (noteObject: HydratedDocument<Note>) =>
+  noteObject.save().then((result) => result);
 
-const noteService = { read, save };
+const update = (id: string, data: { content: string; important: boolean }) =>
+  NoteModel.findByIdAndUpdate(id, data, { new: true }).then((result) => result);
+
+const remove = (id: string) =>
+  NoteModel.findByIdAndDelete(id).then((result) => result);
+
+const noteService = { getAll, get, create, update, remove };
 export default noteService;
