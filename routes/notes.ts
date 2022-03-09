@@ -22,7 +22,7 @@ router.get('/:id', (req, res, next) => {
       }
       res.json(note);
     })
-    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
+    .catch((error) => next(error));
 });
 
 // Create note
@@ -49,18 +49,18 @@ router.post('/', (req, res) => {
 });
 
 // Update note
-router.put('/:id', (req, res) => {
+router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const { content, important } = req.body;
 
   noteService
     .update(id, { content, important })
     .then((updatedNote) => res.json(updatedNote))
-    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
+    .catch((error) => next(error));
 });
 
 // Delete note
-router.delete('/:id', (req, res) => {
+router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
   noteService
@@ -69,7 +69,7 @@ router.delete('/:id', (req, res) => {
       if (!result) return res.sendStatus(404);
       res.json(204);
     })
-    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
+    .catch((error) => next(error));
 });
 
 export default router;

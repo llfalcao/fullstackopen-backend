@@ -10,13 +10,13 @@ router.get('/', (req, res) =>
 );
 
 // Get one person
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
   const { id } = req.params;
 
   personService
     .get(id, null)
     ?.then((person) => (person ? res.json(person) : res.sendStatus(404)))
-    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
+    .catch((error) => next(error));
 });
 
 const handleMissingInfo = (req: Request, res: Response, next: NextFunction) => {
@@ -61,7 +61,7 @@ router.post('/', handleMissingInfo, (req, res) => {
 });
 
 // Update person
-router.put('/:id', handleMissingInfo, (req, res) => {
+router.put('/:id', handleMissingInfo, (req, res, next) => {
   const { id } = req.params;
   const { name, number } = req.body;
 
@@ -74,11 +74,11 @@ router.put('/:id', handleMissingInfo, (req, res) => {
   personService
     .update(id, { name, number })
     .then((updatedPerson) => res.json(updatedPerson))
-    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
+    .catch((error) => next(error));
 });
 
 // Delete person
-router.delete('/:id', (req, res) => {
+router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
   personService
@@ -89,7 +89,7 @@ router.delete('/:id', (req, res) => {
       }
       res.sendStatus(204);
     })
-    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
+    .catch((error) => next(error));
 });
 
 export default router;

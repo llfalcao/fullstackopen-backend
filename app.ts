@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { ErrorRequestHandler, response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { connect } from 'mongoose';
@@ -23,6 +23,18 @@ app.get('/', (req, res) => res.send('Homepage'));
 app.use('/info', infoRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/persons', personRouter);
-app.use((req, res) => res.sendStatus(404));
+
+// Error handler
+const errorHandler = ((error, req, res, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'Invalid ID format' });
+  }
+
+  next(error);
+}) as ErrorRequestHandler;
+
+app.use(errorHandler);
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
