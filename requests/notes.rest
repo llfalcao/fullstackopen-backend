@@ -4,7 +4,7 @@
 GET {{url}}{{notes}}
 
 ###
-GET {{url}}{{notes}}/62269ae776308884ecd0a1c
+GET {{url}}{{notes}}/6227e4333907e8303c643
 
 ###
 POST {{url}}{{notes}}
@@ -16,4 +16,13 @@ Content-Type: application/json
 }
 
 ###
-DELETE {{url}}{{notes}}/62269afda63211036460b49
+PUT {{url}}{{notes}}/6227e4f23d33907e8303c642
+Content-Type: application/json
+
+{
+  "content": "Keep coding",
+  "important": false
+}
+
+###
+DELETE {{url}}{{notes}}/6227e54d4c7a59970f5ca69d

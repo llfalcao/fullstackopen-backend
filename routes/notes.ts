@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { Note, isNote, NoteModel } from '../models/Note';
-import { HydratedDocument, isValidObjectId } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import noteService from '../services/notes';
 
 const router = Router();
@@ -14,11 +14,15 @@ router.get('/', (req, res) =>
 router.get('/:id', (req, res, next) => {
   const { id } = req.params;
 
-  if (!isValidObjectId(id)) {
-    return res.sendStatus(404);
-  }
-
-  noteService.get(id).then((note) => res.json(note));
+  noteService
+    .get(id)
+    .then((note) => {
+      if (!note) {
+        return res.sendStatus(404);
+      }
+      res.json(note);
+    })
+    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
 });
 
 // Create note
@@ -49,27 +53,23 @@ router.put('/:id', (req, res) => {
   const { id } = req.params;
   const { content, important } = req.body;
 
-  if (!isValidObjectId(id)) {
-    return res.sendStatus(404);
-  }
-
   noteService
     .update(id, { content, important })
-    .then((updatedNote) => res.json(updatedNote));
+    .then((updatedNote) => res.json(updatedNote))
+    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
 });
 
 // Delete note
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
-  if (!isValidObjectId(id)) {
-    return res.sendStatus(404);
-  }
-
-  noteService.remove(id).then((result) => {
-    if (!result) return res.sendStatus(404);
-    res.json(204);
-  });
+  noteService
+    .remove(id)
+    .then((result) => {
+      if (!result) return res.sendStatus(404);
+      res.json(204);
+    })
+    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
 });
 
 export default router;

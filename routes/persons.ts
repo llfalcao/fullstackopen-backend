@@ -1,7 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import personService from '../services/persons';
-import { Person, isPerson } from '../models/Person';
-import { HydratedDocument, isValidObjectId } from 'mongoose';
+import { isPerson } from '../models/Person';
 
 const router = Router();
 
@@ -14,13 +13,10 @@ router.get('/', (req, res) =>
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
-  if (!isValidObjectId(id)) {
-    return res.sendStatus(404);
-  }
-
   personService
     .get(id, null)
-    ?.then((person) => (person ? res.json(person) : res.sendStatus(404)));
+    ?.then((person) => (person ? res.json(person) : res.sendStatus(404)))
+    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
 });
 
 const handleMissingInfo = (req: Request, res: Response, next: NextFunction) => {
@@ -69,10 +65,6 @@ router.put('/:id', handleMissingInfo, (req, res) => {
   const { id } = req.params;
   const { name, number } = req.body;
 
-  if (!isValidObjectId(id)) {
-    return res.sendStatus(404);
-  }
-
   if (!isPerson({ name, number })) {
     return res.status(400).json({
       error: 'invalid data type',
@@ -81,23 +73,23 @@ router.put('/:id', handleMissingInfo, (req, res) => {
 
   personService
     .update(id, { name, number })
-    .then((updatedPerson) => res.json(updatedPerson));
+    .then((updatedPerson) => res.json(updatedPerson))
+    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
 });
 
 // Delete person
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
-  if (!isValidObjectId(id)) {
-    return res.sendStatus(404);
-  }
-
-  personService.remove(id).then((result) => {
-    if (!result.acknowledged || result.deletedCount === 0) {
-      return res.sendStatus(404);
-    }
-    res.sendStatus(204);
-  });
+  personService
+    .remove(id)
+    .then((result) => {
+      if (!result.acknowledged || result.deletedCount === 0) {
+        return res.sendStatus(404);
+      }
+      res.sendStatus(204);
+    })
+    .catch((e) => res.status(400).json({ error: 'invalid id format' }));
 });
 
 export default router;

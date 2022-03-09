@@ -4,7 +4,7 @@
 GET {{url}}{{persons}}
 
 ###
-GET {{url}}{{persons}}/6226bd9725c6e25505cbdd63
+GET {{url}}{{persons}}/6227f2a784c6519eea1c0575
 
 
 ###
@@ -12,12 +12,12 @@ POST {{url}}{{persons}}
 Content-Type: application/json
 
 {
-  "name": "Somebody",
+  "name": "Zamn",
   "number": "555-123-4567"
 }
 
 ###
-PUT {{url}}{{persons}}/6226bf67fe8cedac1c6238c9
+PUT {{url}}{{persons}}/6227f2a784c6519eea1c0575
 Content-Type: application/json
 
 {
@@ -26,4 +26,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE {{url}}{{persons}}/6226bd9c25c6e25505cbdd66
+DELETE {{url}}{{persons}}/6227f2a784c6519eea1c0575
