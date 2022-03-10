@@ -12,7 +12,7 @@ POST {{url}}{{persons}}
 Content-Type: application/json
 
 {
-  "name": "Zamn",
+  "name": "Somebody",
   "number": "555-123-4567"
 }
 
