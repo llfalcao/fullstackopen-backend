@@ -1,6 +1,11 @@
 import { PersonModel, Person } from '../models/Person';
 import { HydratedDocument, isValidObjectId } from 'mongoose';
 
+interface PersonBody {
+  name: string;
+  number: string;
+}
+
 const getAll = (): Promise<Person[]> =>
   PersonModel.find({}).then((result) => result);
 
@@ -15,18 +20,12 @@ const get = (
   }
 };
 
-const create = (personObject: {
-  name: string;
-  number: string;
-}): Promise<Person> => {
-  const person: HydratedDocument<Person> = new PersonModel({ ...personObject });
+const create = (data: PersonBody): Promise<Person> => {
+  const person: HydratedDocument<Person> = new PersonModel({ ...data });
   return person.save().then((result) => result);
 };
 
-const update = (
-  id: string,
-  data: { name: string; number: string },
-): Promise<Person> =>
+const update = (id: string, data: PersonBody): Promise<Person> =>
   PersonModel.findOneAndUpdate({ _id: id }, data, { new: true }).then(
     (result) => result,
   );

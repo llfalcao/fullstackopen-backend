@@ -27,25 +27,21 @@ router.get('/:id', (req, res, next) => {
 
 // Create note
 router.post('/', (req, res) => {
-  const { body } = req;
+  const { content, important } = req.body;
 
-  if (!body.content) {
+  if (!content) {
     return res.status(400).json({
       error: 'content missing',
     });
   }
 
-  const note: HydratedDocument<Note> = new NoteModel({
-    content: body.content,
-    date: new Date(),
-    important: body.important,
-  });
-
-  if (!isNote(note)) {
-    return res.sendStatus(400);
+  if (!isNote({ content, important })) {
+    return res.status(400).json({ error: 'invalid value type' });
   }
 
-  noteService.create(note).then((createdNote) => res.json(createdNote));
+  noteService
+    .create({ content, important })
+    .then((createdNote) => res.json(createdNote));
 });
 
 // Update note

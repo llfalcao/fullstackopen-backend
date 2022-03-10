@@ -4,7 +4,7 @@ import { isPerson } from '../models/Person';
 
 const router = Router();
 
-// Get all 'persons'
+// Get all people
 router.get('/', (req, res) =>
   personService.getAll().then((persons) => res.json(persons)),
 );
