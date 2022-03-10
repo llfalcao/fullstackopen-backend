@@ -1,6 +1,4 @@
 import { Router } from 'express';
-import { Note, isNote, NoteModel } from '../models/Note';
-import { HydratedDocument } from 'mongoose';
 import noteService from '../services/notes';
 
 const router = Router();
@@ -16,32 +14,18 @@ router.get('/:id', (req, res, next) => {
 
   noteService
     .get(id)
-    .then((note) => {
-      if (!note) {
-        return res.sendStatus(404);
-      }
-      res.json(note);
-    })
+    .then((note) => (note ? res.json(note) : res.sendStatus(404)))
     .catch((error) => next(error));
 });
 
 // Create note
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
   const { content, important } = req.body;
-
-  if (!content) {
-    return res.status(400).json({
-      error: 'content missing',
-    });
-  }
-
-  if (!isNote({ content, important })) {
-    return res.status(400).json({ error: 'invalid value type' });
-  }
 
   noteService
     .create({ content, important })
-    .then((createdNote) => res.json(createdNote));
+    .then((createdNote) => res.json(createdNote))
+    .catch((error) => next(error));
 });
 
 // Update note

@@ -27,10 +27,15 @@ app.use((req, res) => res.sendStatus(404));
 
 // Error handler
 const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
-  console.error(error.message);
+  console.error(error);
 
   if (error.name === 'CastError') {
     return res.status(400).json({ error: 'Invalid ID format' });
+  }
+
+  if (error.name === 'ValidationError') {
+    const { message } = error.errors.content;
+    return res.status(400).json({ error: message });
   }
 };
 

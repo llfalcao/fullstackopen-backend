@@ -8,9 +8,21 @@ export interface Note {
 }
 
 const noteSchema = new Schema({
-  content: String,
-  date: Date,
-  important: Boolean,
+  content: {
+    type: String,
+    trim: true,
+    minlength: [5, 'Note is too short'],
+    match: [/.*\S.*/, 'Note must not contain only spaces'],
+    required: [true, 'Content missing'],
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
+  important: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 noteSchema.set('toJSON', {
@@ -22,6 +34,3 @@ noteSchema.set('toJSON', {
 });
 
 export const NoteModel = model('Note', noteSchema);
-
-export const isNote = (object: any): object is Note =>
-  typeof object.content === 'string' && typeof object.important === 'boolean';
