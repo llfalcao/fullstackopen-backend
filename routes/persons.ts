@@ -18,26 +18,8 @@ router.get('/:id', (req, res, next) => {
     .catch((error) => next(error));
 });
 
-const handleMissingInfo = (req: Request, res: Response, next: NextFunction) => {
-  const { name, number } = req.body;
-
-  if (!name) {
-    return res.status(400).json({
-      error: 'Name missing',
-    });
-  }
-
-  if (!number) {
-    return res.status(400).json({
-      error: 'Number missing',
-    });
-  }
-
-  next();
-};
-
 // Create person
-router.post('/', handleMissingInfo, (req, res, next) => {
+router.post('/', (req, res, next) => {
   const { name, number } = req.body;
 
   personService.get(null, name)?.then((person) => {
@@ -55,7 +37,7 @@ router.post('/', handleMissingInfo, (req, res, next) => {
 });
 
 // Update person
-router.put('/:id', handleMissingInfo, (req, res, next) => {
+router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const { name, number } = req.body;
 

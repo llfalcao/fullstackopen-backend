@@ -26,9 +26,11 @@ const create = (data: PersonBody): Promise<Person> => {
 };
 
 const update = (id: string, data: PersonBody): Promise<Person> =>
-  PersonModel.findOneAndUpdate({ _id: id }, data, { new: true }).then(
-    (result) => result,
-  );
+  PersonModel.findOneAndUpdate({ _id: id }, data, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  }).then((result) => result);
 
 const remove = (id: string) =>
   PersonModel.deleteOne({ _id: id }).then((result) => result);

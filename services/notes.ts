@@ -21,7 +21,11 @@ const create = (data: NoteBody): Promise<Note> => {
 };
 
 const update = (id: string, data: NoteBody) =>
-  NoteModel.findByIdAndUpdate(id, data, { new: true }).then((result) => result);
+  NoteModel.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  }).then((result) => result);
 
 const remove = (id: string) =>
   NoteModel.findByIdAndDelete(id).then((result) => result);
