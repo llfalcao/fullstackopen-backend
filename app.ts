@@ -25,7 +25,6 @@ app.use('/api/notes', notesRouter);
 app.use('/api/persons', personRouter);
 app.use((req, res) => res.sendStatus(404));
 
-// Error handler
 const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   console.error(error);
 
@@ -34,9 +33,14 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   }
 
   if (error.name === 'ValidationError') {
-    const { message } = error.errors.content;
-    return res.status(400).json({ error: message });
+    let errors: { [key in string]: string } = {};
+    Object.keys(error.errors).forEach(
+      (key) => (errors[key] = error.errors[key].message),
+    );
+    return res.status(400).json(errors);
   }
+
+  res.json('Something went wrong.');
 };
 
 app.use(errorHandler);

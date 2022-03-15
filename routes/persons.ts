@@ -1,6 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import personService from '../services/persons';
-import { isPerson } from '../models/Person';
 
 const router = Router();
 
@@ -24,13 +23,13 @@ const handleMissingInfo = (req: Request, res: Response, next: NextFunction) => {
 
   if (!name) {
     return res.status(400).json({
-      error: 'name missing',
+      error: 'Name missing',
     });
   }
 
   if (!number) {
     return res.status(400).json({
-      error: 'number missing',
+      error: 'Number missing',
     });
   }
 
@@ -38,25 +37,20 @@ const handleMissingInfo = (req: Request, res: Response, next: NextFunction) => {
 };
 
 // Create person
-router.post('/', handleMissingInfo, (req, res) => {
+router.post('/', handleMissingInfo, (req, res, next) => {
   const { name, number } = req.body;
-
-  if (!isPerson({ name, number })) {
-    return res.status(400).json({
-      error: 'invalid data type',
-    });
-  }
 
   personService.get(null, name)?.then((person) => {
     if (person && person.name === name) {
       return res.status(409).json({
-        error: 'name must be unique',
+        error: 'Name must be unique',
       });
     }
 
     personService
       .create({ name, number })
-      .then((createdPerson) => res.json(createdPerson));
+      .then((createdPerson) => res.json(createdPerson))
+      .catch((error) => next(error));
   });
 });
 
@@ -64,12 +58,6 @@ router.post('/', handleMissingInfo, (req, res) => {
 router.put('/:id', handleMissingInfo, (req, res, next) => {
   const { id } = req.params;
   const { name, number } = req.body;
-
-  if (!isPerson({ name, number })) {
-    return res.status(400).json({
-      error: 'invalid data type',
-    });
-  }
 
   personService
     .update(id, { name, number })
