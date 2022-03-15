@@ -10,6 +10,7 @@ const personSchema = new Schema({
   name: {
     type: String,
     trim: true,
+    minlength: [3, 'Name is too short'],
     required: true,
   },
   number: {
