@@ -1,5 +1,5 @@
 import { PersonModel, Person } from '../models/Person';
-import { HydratedDocument, isValidObjectId } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
 interface PersonBody {
   name: string;

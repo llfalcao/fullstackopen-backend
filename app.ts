@@ -1,4 +1,4 @@
-import express, { ErrorRequestHandler, response } from 'express';
+import express, { ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { connect } from 'mongoose';
@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 const port = 8080;
-const mongoDbUrl = process.env.MONGODB!;
+const mongoDbUrl = process.env.MONGODB as string;
 connect(mongoDbUrl).catch((error) => console.log(error));
 
 app.use(cors());
@@ -25,7 +25,7 @@ app.use('/api/notes', notesRouter);
 app.use('/api/persons', personRouter);
 app.use((req, res) => res.sendStatus(404));
 
-const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
+const errorHandler: ErrorRequestHandler = (error, req, res) => {
   console.error(error);
 
   if (error.name === 'CastError') {
@@ -36,7 +36,7 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   }
 
   if (error.name === 'ValidationError') {
-    let errors: { [key in string]: string } = {};
+    const errors: { [key in string]: string } = {};
     Object.keys(error.errors).forEach(
       (key) => (errors[key] = error.errors[key].message),
     );

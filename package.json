@@ -7,7 +7,8 @@
   "main": "app.ts",
   "scripts": {
     "start": "esr app.ts",
-    "dev": "nodemon --exec esr app.ts"
+    "dev": "nodemon --exec esr app.ts",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@types/cors": "^2.8.12",
@@ -19,9 +20,13 @@
     "mongoose": "^6.2.4"
   },
   "devDependencies": {
+    "@eslint/create-config": "^0.1.2",
     "@types/morgan": "^1.9.3",
+    "@typescript-eslint/eslint-plugin": "^5.15.0",
+    "@typescript-eslint/parser": "^5.15.0",
     "esbuild": "^0.14.23",
     "esbuild-runner": "^2.2.1",
+    "eslint": "^8.11.0",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.15",
     "typescript": "^4.5.5"

@@ -5,10 +5,12 @@ const router = Router();
 
 router.get('/', (req, res) => {
   console.log('router');
-  personService.read().then((persons) => {
+  personService.getAll().then((persons) => {
     const now = new Date().toUTCString();
     const output = `
-      <p>Phonebook has info for ${persons.length} people.</p>
+      <p>Phonebook has info for ${persons.length} ${
+      persons.length === 1 ? 'person' : 'people'
+    }.</p>
       <p>${now}</p>
     `;
     res.send(output);
