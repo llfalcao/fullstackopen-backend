@@ -19,8 +19,9 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
 
   if (error.name === 'CastError') {
     if (error.path === '_id') {
-      return res.status(400).json({ error: 'Invalid ID format' });
+      error.message = 'Invalid ID format';
     }
+
     return res.status(400).json({ error: error.message });
   }
 
@@ -29,10 +30,11 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     Object.keys(error.errors).forEach(
       (key) => (errors[key] = error.errors[key].message),
     );
+
     return res.status(400).json(errors);
   }
 
-  res.json('Something went wrong.');
+  res.status(500).json('Something went wrong.');
   next();
 };
 
