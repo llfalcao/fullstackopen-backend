@@ -35,7 +35,7 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   }
 
   res.status(500).json('Something went wrong.');
-  next();
+  next(error);
 };
 
 const middlewares = { requestLogger, unknownEndpoint, errorHandler };
