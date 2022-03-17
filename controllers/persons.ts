@@ -2,15 +2,15 @@ import { Router } from 'express';
 import { Person, PersonModel } from '../models/Person';
 import { HydratedDocument } from 'mongoose';
 
-const router = Router();
+const personRouter = Router();
 
 // Get all people
-router.get('/', (req, res) =>
+personRouter.get('/', (req, res) =>
   PersonModel.find({}).then((people) => res.json(people)),
 );
 
 // Get one person
-router.get('/:id', (req, res, next) => {
+personRouter.get('/:id', (req, res, next) => {
   const { id } = req.params;
 
   PersonModel.findById(id)
@@ -19,7 +19,7 @@ router.get('/:id', (req, res, next) => {
 });
 
 // Create person
-router.post('/', (req, res, next) => {
+personRouter.post('/', (req, res, next) => {
   const { name, number } = req.body;
 
   PersonModel.findOne({ name }).then((match) => {
@@ -36,7 +36,7 @@ router.post('/', (req, res, next) => {
 });
 
 // Update person
-router.put('/:id', (req, res, next) => {
+personRouter.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const { name, number } = req.body;
 
@@ -50,7 +50,7 @@ router.put('/:id', (req, res, next) => {
 });
 
 // Delete person
-router.delete('/:id', (req, res, next) => {
+personRouter.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
   PersonModel.findByIdAndDelete({ _id: id })
@@ -58,4 +58,4 @@ router.delete('/:id', (req, res, next) => {
     .catch((error) => next(error));
 });
 
-export default router;
+export default personRouter;

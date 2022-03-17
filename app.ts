@@ -1,9 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import { connect } from 'mongoose';
-import notesRouter from './controllers/notes';
+import noteRouter from './controllers/notes';
 import personRouter from './controllers/persons';
-import infoRouter from './controllers/info';
 import config from './utils/config';
 import middlewares from './utils/middlewares';
 import logger from './utils/logger';
@@ -19,9 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use(middlewares.requestLogger);
 
-app.get('/', (req, res) => res.send('Home'));
-app.use('/info', infoRouter);
-app.use('/api/notes', notesRouter);
+app.use('/api/notes', noteRouter);
 app.use('/api/persons', personRouter);
 
 app.use(middlewares.unknownEndpoint);

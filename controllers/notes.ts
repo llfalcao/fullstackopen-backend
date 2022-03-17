@@ -2,15 +2,15 @@ import { Router } from 'express';
 import { Note, NoteModel } from '../models/Note';
 import { HydratedDocument } from 'mongoose';
 
-const router = Router();
+const noteRouter = Router();
 
 // Get all notes
-router.get('/', (req, res) =>
+noteRouter.get('/', (req, res) =>
   NoteModel.find({}).then((notes) => res.json(notes)),
 );
 
 // Get one note
-router.get('/:id', (req, res, next) => {
+noteRouter.get('/:id', (req, res, next) => {
   const { id } = req.params;
 
   NoteModel.findById(id)
@@ -19,7 +19,7 @@ router.get('/:id', (req, res, next) => {
 });
 
 // Create note
-router.post('/', (req, res, next) => {
+noteRouter.post('/', (req, res, next) => {
   const { content, important } = req.body;
 
   const note: HydratedDocument<Note> = new NoteModel({
@@ -35,7 +35,7 @@ router.post('/', (req, res, next) => {
 });
 
 // Update note
-router.put('/:id', (req, res, next) => {
+noteRouter.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const { content, important } = req.body;
 
@@ -49,7 +49,7 @@ router.put('/:id', (req, res, next) => {
 });
 
 // Delete note
-router.delete('/:id', (req, res, next) => {
+noteRouter.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
   NoteModel.findByIdAndDelete(id)
@@ -57,4 +57,4 @@ router.delete('/:id', (req, res, next) => {
     .catch((error) => next(error));
 });
 
-export default router;
+export default noteRouter;
