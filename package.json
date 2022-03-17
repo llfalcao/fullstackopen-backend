@@ -6,8 +6,8 @@
   "license": "MIT",
   "main": "app.ts",
   "scripts": {
-    "start": "esr app.ts",
-    "dev": "nodemon --exec esr app.ts",
+    "start": "esr index.ts",
+    "dev": "nodemon --exec esr index.ts",
     "lint": "eslint ."
   },
   "dependencies": {

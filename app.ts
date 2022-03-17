@@ -1,50 +1,30 @@
-import express, { ErrorRequestHandler } from 'express';
+import express from 'express';
 import cors from 'cors';
-import morgan from 'morgan';
 import { connect } from 'mongoose';
-import notesRouter from './routes/notes';
-import personRouter from './routes/persons';
-import infoRouter from './routes/info';
+import notesRouter from './controllers/notes';
+import personRouter from './controllers/persons';
+import infoRouter from './controllers/info';
+import config from './utils/config';
+import middlewares from './utils/middlewares';
+import logger from './utils/logger';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const port = 8080;
-const mongoDbUrl = process.env.MONGODB as string;
-connect(mongoDbUrl).catch((error) => console.log(error));
+connect(config.MONGODB)
+  .then(() => logger.info('Connected to MongoDB'))
+  .catch((error) => logger.error('Error connecting to MongoDB', error.message));
 
 app.use(cors());
 app.use(express.json());
+app.use(middlewares.requestLogger);
 
-morgan.token('body', (req: express.Request) => JSON.stringify(req.body));
-app.use(morgan(':method :url :status - :response-time ms :body'));
-
-app.get('/', (req, res) => res.send('Homepage'));
+app.get('/', (req, res) => res.send('Home'));
 app.use('/info', infoRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/persons', personRouter);
-app.use((req, res) => res.sendStatus(404));
 
-const errorHandler: ErrorRequestHandler = (error, req, res) => {
-  console.error(error);
+app.use(middlewares.unknownEndpoint);
+app.use(middlewares.errorHandler);
 
-  if (error.name === 'CastError') {
-    if (error.path === '_id') {
-      return res.status(400).json({ error: 'Invalid ID format' });
-    }
-    return res.status(400).json({ error: error.message });
-  }
-
-  if (error.name === 'ValidationError') {
-    const errors: { [key in string]: string } = {};
-    Object.keys(error.errors).forEach(
-      (key) => (errors[key] = error.errors[key].message),
-    );
-    return res.status(400).json(errors);
-  }
-
-  res.json('Something went wrong.');
-};
-
-app.use(errorHandler);
-app.listen(port, () => console.log(`Server running on port ${port}`));
+export default app;

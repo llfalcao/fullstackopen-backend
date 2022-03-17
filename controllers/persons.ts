@@ -1,20 +1,20 @@
 import { Router } from 'express';
-import personService from '../services/persons';
+import { Person, PersonModel } from '../models/Person';
+import { HydratedDocument } from 'mongoose';
 
 const router = Router();
 
 // Get all people
 router.get('/', (req, res) =>
-  personService.getAll().then((persons) => res.json(persons)),
+  PersonModel.find({}).then((people) => res.json(people)),
 );
 
 // Get one person
 router.get('/:id', (req, res, next) => {
   const { id } = req.params;
 
-  personService
-    .get(id, null)
-    ?.then((person) => (person ? res.json(person) : res.sendStatus(404)))
+  PersonModel.findById(id)
+    .then((person) => (person ? res.json(person) : res.sendStatus(404)))
     .catch((error) => next(error));
 });
 
@@ -22,15 +22,14 @@ router.get('/:id', (req, res, next) => {
 router.post('/', (req, res, next) => {
   const { name, number } = req.body;
 
-  personService.get(null, name)?.then((person) => {
-    if (person && person.name === name) {
-      return res.status(409).json({
-        error: 'Name must be unique',
-      });
+  PersonModel.findOne({ name }).then((match) => {
+    if (match) {
+      return res.status(409).json({ error: 'Name must be unique' });
     }
 
-    personService
-      .create({ name, number })
+    const person: HydratedDocument<Person> = new PersonModel({ name, number });
+    person
+      .save()
       .then((createdPerson) => res.json(createdPerson))
       .catch((error) => next(error));
   });
@@ -41,8 +40,11 @@ router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const { name, number } = req.body;
 
-  personService
-    .update(id, { name, number })
+  PersonModel.findOneAndUpdate(
+    { _id: id },
+    { name, number },
+    { new: true, runValidators: true, context: 'query' },
+  )
     .then((updatedPerson) => res.json(updatedPerson))
     .catch((error) => next(error));
 });
@@ -51,14 +53,8 @@ router.put('/:id', (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
-  personService
-    .remove(id)
-    .then((result) => {
-      if (!result.acknowledged || result.deletedCount === 0) {
-        return res.sendStatus(404);
-      }
-      res.sendStatus(204);
-    })
+  PersonModel.findByIdAndDelete({ _id: id })
+    .then((person) => (person ? res.sendStatus(204) : res.sendStatus(404)))
     .catch((error) => next(error));
 });
 

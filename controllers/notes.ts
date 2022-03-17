@@ -1,19 +1,19 @@
 import { Router } from 'express';
-import noteService from '../services/notes';
+import { Note, NoteModel } from '../models/Note';
+import { HydratedDocument } from 'mongoose';
 
 const router = Router();
 
 // Get all notes
 router.get('/', (req, res) =>
-  noteService.getAll().then((notes) => res.json(notes)),
+  NoteModel.find({}).then((notes) => res.json(notes)),
 );
 
 // Get one note
 router.get('/:id', (req, res, next) => {
   const { id } = req.params;
 
-  noteService
-    .get(id)
+  NoteModel.findById(id)
     .then((note) => (note ? res.json(note) : res.sendStatus(404)))
     .catch((error) => next(error));
 });
@@ -22,8 +22,14 @@ router.get('/:id', (req, res, next) => {
 router.post('/', (req, res, next) => {
   const { content, important } = req.body;
 
-  noteService
-    .create({ content, important })
+  const note: HydratedDocument<Note> = new NoteModel({
+    date: new Date(),
+    content,
+    important,
+  });
+
+  note
+    .save()
     .then((createdNote) => res.json(createdNote))
     .catch((error) => next(error));
 });
@@ -33,8 +39,11 @@ router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const { content, important } = req.body;
 
-  noteService
-    .update(id, { content, important })
+  NoteModel.findByIdAndUpdate(
+    id,
+    { content, important },
+    { new: true, runValidators: true, context: 'query' },
+  )
     .then((updatedNote) => res.json(updatedNote))
     .catch((error) => next(error));
 });
@@ -43,12 +52,8 @@ router.put('/:id', (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
-  noteService
-    .remove(id)
-    .then((result) => {
-      if (!result) return res.sendStatus(404);
-      res.json(204);
-    })
+  NoteModel.findByIdAndDelete(id)
+    .then((note) => (note ? res.sendStatus(204) : res.sendStatus(404)))
     .catch((error) => next(error));
 });
 
