@@ -1,1 +1,1 @@
-web: NODE_ENV=production esr ./index.ts
+web: NODE_ENV=production yarn start
