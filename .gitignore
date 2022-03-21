@@ -4,3 +4,5 @@ yarn-error.log
 
 # mock db
 /db.json
+
+for_testing.js
