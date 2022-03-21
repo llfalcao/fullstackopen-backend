@@ -7,8 +7,18 @@ export interface Person {
 }
 
 const personSchema = new Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    trim: true,
+    minlength: [3, 'Name is too short'],
+    required: true,
+  },
+  number: {
+    type: String,
+    trim: true,
+    match: [/^\S+$/, 'Number must not contain spaces'],
+    required: true,
+  },
 });
 
 personSchema.set('toJSON', {
@@ -20,6 +30,3 @@ personSchema.set('toJSON', {
 });
 
 export const PersonModel = model('Person', personSchema);
-
-export const isPerson = (object: any): object is Person =>
-  typeof object.name === 'string' && typeof object.number === 'string';
