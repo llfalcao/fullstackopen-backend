@@ -3,6 +3,7 @@ import cors from 'cors';
 import { connect } from 'mongoose';
 import noteRouter from './controllers/notes';
 import personRouter from './controllers/persons';
+import blogRouter from './controllers/blog';
 import config from './utils/config';
 import middlewares from './utils/middlewares';
 import logger from './utils/logger';
@@ -20,6 +21,7 @@ app.use(middlewares.requestLogger);
 
 app.use('/api/notes', noteRouter);
 app.use('/api/persons', personRouter);
+app.use('/api/blogs', blogRouter);
 
 app.use(middlewares.unknownEndpoint);
 app.use(middlewares.errorHandler);
