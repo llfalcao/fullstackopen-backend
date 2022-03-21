@@ -1,0 +1,15 @@
+@url = http://localhost:8080
+@blogs = /api/blogs
+
+GET {{url}}{{blogs}}
+
+###
+POST {{url}}{{blogs}}
+Content-Type: application/json
+
+{
+  "title": "NodeJS Blog",
+  "author": "llfalcao",
+  "url": "https://nodecode.io",
+  "likes": 15694
+}
