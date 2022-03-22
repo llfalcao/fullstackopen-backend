@@ -1,9 +1,10 @@
 const reverse = (string: string) => string.split('').reverse().join('');
 
 const average = (numbers: number[]) => {
+  const reducer = (sum: number, n: number) => sum + n;
+
   if (numbers.length === 0) return 0;
-  const sum = numbers.reduce((sum, n) => sum + n, 0);
-  return sum / numbers.length;
+  return numbers.reduce(reducer, 0) / numbers.length;
 };
 
 export { reverse, average };
