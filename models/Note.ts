@@ -1,7 +1,6 @@
-import { model, ObjectId, Schema } from 'mongoose';
+import { model, Schema } from 'mongoose';
 
 export interface Note {
-  _id: ObjectId;
   content: string;
   date: string;
   important: boolean;
@@ -33,4 +32,4 @@ noteSchema.set('toJSON', {
   },
 });
 
-export const NoteModel = model('Note', noteSchema);
+export const NoteModel = model<Note>('Note', noteSchema);

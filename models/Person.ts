@@ -1,7 +1,6 @@
-import { model, ObjectId, Schema } from 'mongoose';
+import { model, Schema } from 'mongoose';
 
 export interface Person {
-  _id: ObjectId;
   name: string;
   number: string;
 }
@@ -29,4 +28,4 @@ personSchema.set('toJSON', {
   },
 });
 
-export const PersonModel = model('Person', personSchema);
+export const PersonModel = model<Person>('Person', personSchema);

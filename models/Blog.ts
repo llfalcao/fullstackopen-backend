@@ -1,7 +1,6 @@
-import { Schema, ObjectId, model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 export interface Blog {
-  _id: ObjectId;
   title: string;
   author: string;
   url: string;
@@ -23,4 +22,4 @@ blogSchema.set('toJSON', {
   },
 });
 
-export const BlogModel = model('Blog', blogSchema);
+export const BlogModel = model<Blog>('Blog', blogSchema);
