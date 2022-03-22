@@ -1,5 +1,6 @@
 import { Blog } from '../models/Blog';
 import listHelper from '../utils/list_helper';
+import listWithMultipleBlogs from '../db/blogs.json';
 
 test('dummy returns one', () => {
   const blogs: Blog[] = [];
@@ -20,5 +21,10 @@ describe('total likes', () => {
 
     const result = listHelper.totalLikes(listWithOneBlog);
     expect(result).toBe(5);
+  });
+
+  test('of multiple blogs', () => {
+    const result = listHelper.totalLikes(listWithMultipleBlogs);
+    expect(result).toBe(36);
   });
 });
