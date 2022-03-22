@@ -16,5 +16,23 @@ const favoriteBlog = (blogs: Blog[]) => {
   return { title, author, likes };
 };
 
-const listHelper = { dummy, favoriteBlog, totalLikes };
+const mostBlogs = (blogs: Blog[]) => {
+  const ranking: { name: string; count: number }[] = [];
+
+  blogs.forEach((blog) => {
+    const index = ranking.findIndex((a) => a.name === blog.author);
+    if (index === -1) {
+      ranking.push({ name: blog.author, count: 1 });
+    } else {
+      ranking[index] = { ...ranking[index], count: ranking[index].count + 1 };
+    }
+  });
+
+  return ranking.reduce(
+    (top, author) => (author.count > top.count ? author : top),
+    ranking[0],
+  );
+};
+
+const listHelper = { dummy, favoriteBlog, mostBlogs, totalLikes };
 export default listHelper;

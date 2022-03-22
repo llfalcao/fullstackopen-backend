@@ -37,3 +37,8 @@ test('favorite blog', () => {
     title: 'Canonical string reduction',
   });
 });
+
+test('most blogs', () => {
+  const result = listHelper.mostBlogs(listWithMultipleBlogs);
+  expect(result).toEqual({ name: 'Robert C. Martin', count: 3 });
+});
