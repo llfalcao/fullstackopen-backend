@@ -1,16 +1,13 @@
 import { average } from '../utils/for_testing';
 
-test('average of array', () => {
-  const result = average([1, 2, 3, 4, 5]);
-  expect(result).toBe(3);
+test('of one value is the value itself', () => {
+  expect(average([1])).toBe(1);
 });
 
-test('average of array', () => {
-  const result = average([5, 10, 15, 20, 25, 30]);
-  expect(result).toBe(17.5);
+test('of many is calculated right', () => {
+  expect(average([1, 2, 3, 4, 5, 6])).toBe(3.5);
 });
 
-test('average of array', () => {
-  const result = average([2, 64, 578, 597, 52, 6]);
-  expect(result).toBe(216.5);
+test('of empty array is zero', () => {
+  expect(average([])).toBe(0);
 });
