@@ -40,5 +40,10 @@ test('favorite blog', () => {
 
 test('most blogs', () => {
   const result = listHelper.mostBlogs(listWithMultipleBlogs);
-  expect(result).toEqual({ name: 'Robert C. Martin', count: 3 });
+  expect(result).toEqual({ name: 'Robert C. Martin', blogs: 3 });
+});
+
+test('most likes', () => {
+  const result = listHelper.mostLikes(listWithMultipleBlogs);
+  expect(result).toEqual({ name: 'Edsger W. Dijkstra', likes: 17 });
 });

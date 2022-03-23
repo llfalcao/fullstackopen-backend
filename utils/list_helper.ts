@@ -17,22 +17,44 @@ const favoriteBlog = (blogs: Blog[]) => {
 };
 
 const mostBlogs = (blogs: Blog[]) => {
-  const ranking: { name: string; count: number }[] = [];
+  const ranking = blogs.reduce((ranking, blog) => {
+    const i = ranking.findIndex((author) => author.name === blog.author);
 
-  blogs.forEach((blog) => {
-    const index = ranking.findIndex((a) => a.name === blog.author);
-    if (index === -1) {
-      ranking.push({ name: blog.author, count: 1 });
+    if (i === -1) {
+      ranking.push({ name: blog.author, blogs: 1 });
     } else {
-      ranking[index] = { ...ranking[index], count: ranking[index].count + 1 };
+      ranking[i] = { ...ranking[i], blogs: ranking[i].blogs + 1 };
     }
-  });
+
+    return ranking;
+  }, <{ name: string; blogs: number }[]>[]);
 
   return ranking.reduce(
-    (top, author) => (author.count > top.count ? author : top),
+    (topAuthor, author) =>
+      author.blogs > topAuthor.blogs ? author : topAuthor,
     ranking[0],
   );
 };
 
-const listHelper = { dummy, favoriteBlog, mostBlogs, totalLikes };
+const mostLikes = (blogs: Blog[]) => {
+  const ranking = blogs.reduce((ranking, blog) => {
+    const i = ranking.findIndex((author) => author.name === blog.author);
+
+    if (i === -1) {
+      ranking.push({ name: blog.author, likes: blog.likes });
+    } else {
+      ranking[i] = { ...ranking[i], likes: ranking[i].likes + blog.likes };
+    }
+
+    return ranking;
+  }, <{ name: string; likes: number }[]>[]);
+
+  return ranking.reduce(
+    (topAuthor, author) =>
+      author.likes > topAuthor.likes ? author : topAuthor,
+    ranking[0],
+  );
+};
+
+const listHelper = { dummy, favoriteBlog, mostBlogs, mostLikes, totalLikes };
 export default listHelper;
