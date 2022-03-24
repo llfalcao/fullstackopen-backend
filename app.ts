@@ -11,6 +11,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
+
 connect(config.MONGODB)
   .then(() => logger.info('Connected to MongoDB'))
   .catch((error) => logger.error('Error connecting to MongoDB', error.message));

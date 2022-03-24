@@ -30,7 +30,6 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     Object.keys(error.errors).forEach(
       (key) => (errors[key] = error.errors[key].message),
     );
-
     return res.status(400).json(errors);
   }
 
