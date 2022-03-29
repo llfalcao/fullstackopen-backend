@@ -30,7 +30,7 @@ noteRouter.post('/', (req, res, next) => {
 
   note
     .save()
-    .then((createdNote) => res.json(createdNote))
+    .then((createdNote) => res.status(201).json(createdNote))
     .catch((error) => next(error));
 });
 

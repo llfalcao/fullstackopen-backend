@@ -30,7 +30,7 @@ personRouter.post('/', (req, res, next) => {
     const person: HydratedDocument<Person> = new PersonModel({ name, number });
     person
       .save()
-      .then((createdPerson) => res.json(createdPerson))
+      .then((createdPerson) => res.status(201).json(createdPerson))
       .catch((error) => next(error));
   });
 });

@@ -44,7 +44,7 @@ test('a valid note can be added', async () => {
   await api
     .post('/api/notes')
     .send(newNote)
-    .expect(200)
+    .expect(201)
     .expect('Content-Type', /application\/json/);
 
   const response = await api.get('/api/notes');
@@ -52,4 +52,9 @@ test('a valid note can be added', async () => {
 
   expect(response.body).toHaveLength(initialNotes.length + 1);
   expect(contents).toContain('Rage, my soldiers!');
+});
+
+test('note without content is not added', async () => {
+  const newNote = { content: '', important: true };
+  await api.post('/api/notes').send(newNote).expect(400);
 });
