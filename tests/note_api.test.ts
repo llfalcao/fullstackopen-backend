@@ -32,13 +32,24 @@ test('notes are returned from json', async () => {
     .expect('Content-Type', /application\/json/);
 });
 
-test('all notes are returned', async () => {
-  const response = await api.get('/api/notes');
-  expect(response.body).toHaveLength(initialNotes.length);
-});
-
 test('a specific note is within the returned notes', async () => {
   const response = await api.get('/api/notes');
   const contents = response.body.map((r: Note) => r.content);
   expect(contents).toContain('HTML is easy');
+});
+
+test('a valid note can be added', async () => {
+  const newNote = { content: 'Rage, my soldiers!', important: true };
+
+  await api
+    .post('/api/notes')
+    .send(newNote)
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
+  const response = await api.get('/api/notes');
+  const contents = response.body.map((r: Note) => r.content);
+
+  expect(response.body).toHaveLength(initialNotes.length + 1);
+  expect(contents).toContain('Rage, my soldiers!');
 });
