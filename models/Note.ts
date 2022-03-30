@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 
 export interface Note {
   content: string;
-  date: string;
+  date: Date;
   important: boolean;
 }
 
