@@ -5,57 +5,51 @@ import { HydratedDocument } from 'mongoose';
 const personRouter = Router();
 
 // Get all people
-personRouter.get('/', (req, res) =>
-  PersonModel.find({}).then((people) => res.json(people)),
-);
+personRouter.get('/', async (req, res) => {
+  const people = await PersonModel.find({});
+  res.json(people);
+});
 
 // Get one person
-personRouter.get('/:id', (req, res, next) => {
+personRouter.get('/:id', async (req, res) => {
   const { id } = req.params;
-
-  PersonModel.findById(id)
-    .then((person) => (person ? res.json(person) : res.sendStatus(404)))
-    .catch((error) => next(error));
+  const person = await PersonModel.findById(id);
+  person ? res.json(person) : res.sendStatus(404);
 });
 
 // Create person
-personRouter.post('/', (req, res, next) => {
+personRouter.post('/', async (req, res) => {
   const { name, number } = req.body;
+  const isMatch = await PersonModel.findOne({ name });
 
-  PersonModel.findOne({ name }).then((match) => {
-    if (match) {
-      return res.status(409).json({ error: 'Name must be unique' });
-    }
+  if (isMatch) {
+    return res.status(409).json({ error: 'Name must be unique' });
+  }
 
-    const person: HydratedDocument<Person> = new PersonModel({ name, number });
-    person
-      .save()
-      .then((createdPerson) => res.status(201).json(createdPerson))
-      .catch((error) => next(error));
-  });
+  const person: HydratedDocument<Person> = new PersonModel({ name, number });
+  const createdPerson = await person.save();
+  res.status(201).json(createdPerson);
 });
 
 // Update person
-personRouter.put('/:id', (req, res, next) => {
+personRouter.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { name, number } = req.body;
 
-  PersonModel.findOneAndUpdate(
+  const updatedPerson = await PersonModel.findOneAndUpdate(
     { _id: id },
     { name, number },
     { new: true, runValidators: true, context: 'query' },
-  )
-    .then((updatedPerson) => res.json(updatedPerson))
-    .catch((error) => next(error));
+  );
+
+  res.json(updatedPerson);
 });
 
 // Delete person
-personRouter.delete('/:id', (req, res, next) => {
+personRouter.delete('/:id', async (req, res) => {
   const { id } = req.params;
-
-  PersonModel.findByIdAndDelete({ _id: id })
-    .then((person) => (person ? res.sendStatus(204) : res.sendStatus(404)))
-    .catch((error) => next(error));
+  const deletedPerson = await PersonModel.findByIdAndDelete({ _id: id });
+  deletedPerson ? res.sendStatus(204) : res.sendStatus(404);
 });
 
 export default personRouter;

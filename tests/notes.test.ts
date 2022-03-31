@@ -8,9 +8,10 @@ const api = supertest(app);
 beforeEach(async () => {
   await NoteModel.deleteMany({});
 
-  for await (const note of helper.initialNotes) {
-    new NoteModel(note).save();
-  }
+  let newNote = new NoteModel(helper.initialNotes[0]);
+  await newNote.save();
+  newNote = new NoteModel(helper.initialNotes[1]);
+  await newNote.save();
 });
 
 test('notes are returned as json', async () => {
@@ -53,4 +54,17 @@ test('note without content is not added', async () => {
 
   const notesAtEnd = await helper.notesInDb();
   expect(notesAtEnd).toHaveLength(helper.initialNotes.length);
+});
+
+test('a specific note can be viewed', async () => {
+  const notesAtStart = await helper.notesInDb();
+  const noteToView = notesAtStart[0];
+
+  const resultNote = await api
+    .get(`/api/notes/${noteToView.id}`)
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
+  const processedNoteToView = JSON.parse(JSON.stringify(noteToView));
+  expect(resultNote.body).toEqual(processedNoteToView);
 });

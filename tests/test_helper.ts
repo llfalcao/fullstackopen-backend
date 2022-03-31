@@ -18,7 +18,7 @@ const generateObjectId = () => new Types.ObjectId();
 
 const notesInDb = async () => {
   const notes = await NoteModel.find({});
-  return notes.map((n) => n.toJSON());
+  return notes.map((note) => note.toJSON({}));
 };
 
 const helper = { initialNotes, generateObjectId, notesInDb };

@@ -1,4 +1,5 @@
 import express from 'express';
+require('express-async-errors');
 import cors from 'cors';
 import { connect } from 'mongoose';
 import noteRouter from './controllers/notes';
