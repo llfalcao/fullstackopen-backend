@@ -1,4 +1,5 @@
 import supertest from 'supertest';
+import 'express-async-errors';
 import app from '../app';
 import { Note, NoteModel } from '../models/Note';
 import helper from './test_helper';
@@ -9,11 +10,11 @@ beforeEach(async () => {
   await NoteModel.deleteMany({});
   console.log('cleared');
 
-  helper.initialNotes.forEach(async (note) => {
-    const noteObject = new NoteModel(note);
-    await noteObject.save();
+  for await (const n of helper.initialNotes) {
+    await new NoteModel(n).save();
     console.log('saved');
-  });
+  }
+
   console.log('done');
 });
 
@@ -61,8 +62,9 @@ test('note without content is not added', async () => {
 
 test('a specific note can be viewed', async () => {
   const notesAtStart = await helper.notesInDb();
-  const noteToView = notesAtStart[0];
+  expect(notesAtStart).toHaveLength(helper.initialNotes.length);
 
+  const noteToView = notesAtStart[0];
   const resultNote = await api
     .get(`/api/notes/${noteToView.id}`)
     .expect(200)
