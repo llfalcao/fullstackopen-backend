@@ -72,6 +72,11 @@ test('missing property "likes" returns zero by default', async () => {
   expect(lastAdded.likes).toEqual(0);
 });
 
+test('note missing title and url is rejected', async () => {
+  const newBlog = { author: 'Robert C. Martin' };
+  await api.post('/api/blogs').send(newBlog).expect(400);
+});
+
 describe('total likes', () => {
   test('of one blog to be equal to their like count', () => {
     const listWithOneBlog: Blog[] = [

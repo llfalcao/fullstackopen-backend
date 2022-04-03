@@ -8,10 +8,22 @@ export interface Blog {
 }
 
 const blogSchema = new Schema({
-  title: String,
-  author: String,
-  url: String,
-  likes: { type: Number, default: 0 },
+  title: {
+    type: String,
+    required: [true, 'Title required'],
+  },
+  author: {
+    type: String,
+    required: [true, 'Author required'],
+  },
+  url: {
+    type: String,
+    required: [true, 'URL required'],
+  },
+  likes: {
+    type: Number,
+    default: 0,
+  },
 });
 
 blogSchema.set('toJSON', {

@@ -27,10 +27,12 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
 
   if (error.name === 'ValidationError') {
     const errors: { [key in string]: string } = {};
+
     Object.keys(error.errors).forEach(
       (key) => (errors[key] = error.errors[key].message),
     );
-    return res.status(400).json(errors);
+
+    return res.status(400).json({ errors });
   }
 
   res.status(500).json('Something went wrong.');
