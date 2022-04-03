@@ -25,6 +25,7 @@ test('returns list of blogs', async () => {
 test('the unique identifier is named "id"', async () => {
   const response = await api
     .get('/api/blogs')
+    .expect(200)
     .expect('Content-Type', /application\/json/);
 
   expect(response.body[0].id).toBeDefined();
@@ -33,6 +34,7 @@ test('the unique identifier is named "id"', async () => {
 test('a specific blog is within the returned blogs', async () => {
   const response = await api
     .get('/api/blogs')
+    .expect(200)
     .expect('Content-Type', /application\/json/);
 
   const contents = response.body.map((blog: Blog) => blog.title);
@@ -54,6 +56,20 @@ test('a valid blog can be added', async () => {
 
   const contents = blogsAtEnd.map((blog) => blog.title);
   expect(contents).toContain('Canonical string reduction');
+});
+
+test('missing property "likes" returns zero by default', async () => {
+  const newBlog = {
+    title: 'First class tests',
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
+  };
+
+  await api.post('/api/blogs').send(newBlog);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  const lastAdded = blogsAtEnd[blogsAtEnd.length - 1];
+  expect(lastAdded.likes).toEqual(0);
 });
 
 describe('total likes', () => {
