@@ -5,12 +5,13 @@ import { HydratedDocument } from 'mongoose';
 const blogRouter = Router();
 
 // Get all blogs
-blogRouter.get('/', (req, res) => {
-  BlogModel.find({}).then((blogs) => res.json(blogs));
+blogRouter.get('/', async (req, res) => {
+  const blogs = await BlogModel.find({});
+  res.json(blogs);
 });
 
 // Create blog
-blogRouter.post('/', (req, res, next) => {
+blogRouter.post('/', async (req, res) => {
   const { title, author, url, likes } = req.body;
 
   const blog: HydratedDocument<Blog> = new BlogModel({
@@ -20,10 +21,8 @@ blogRouter.post('/', (req, res, next) => {
     likes,
   });
 
-  blog
-    .save()
-    .then((result) => res.status(201).json(result))
-    .catch((error) => next(error));
+  const createdBlog = await blog.save();
+  res.status(201).json(createdBlog);
 });
 
 export default blogRouter;
