@@ -1,5 +1,4 @@
 import supertest from 'supertest';
-import 'express-async-errors';
 import app from '../app';
 import { Note, NoteModel } from '../models/Note';
 import helper from './test_helper';

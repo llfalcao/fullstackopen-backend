@@ -1,11 +1,42 @@
-import { Blog } from '../models/Blog';
-import listHelper from '../utils/list_helper';
+import supertest from 'supertest';
+import app from '../app';
+import { Blog, BlogModel } from '../models/Blog';
+import helper from '../tests/test_helper';
 import listWithMultipleBlogs from '../db/blogs.json';
 
-test('dummy returns one', () => {
-  const blogs: Blog[] = [];
-  const result = listHelper.dummy(blogs);
-  expect(result).toBe(1);
+const api = supertest(app);
+
+beforeEach(async () => {
+  await BlogModel.deleteMany({});
+
+  for await (const blog of helper.initialBlogs) {
+    await new BlogModel(blog).save();
+  }
+});
+
+test('returns list of blogs', async () => {
+  const response = await api
+    .get('/api/blogs')
+    .expect('Content-Type', /application\/json/);
+
+  expect(response.body).toHaveLength(helper.initialBlogs.length);
+});
+
+test('the unique identifier is named "id"', async () => {
+  const response = await api
+    .get('/api/blogs')
+    .expect('Content-Type', /application\/json/);
+
+  expect(response.body[0].id).toBeDefined();
+});
+
+test('a specific blog is within the returned blogs', async () => {
+  const response = await api
+    .get('/api/blogs')
+    .expect('Content-Type', /application\/json/);
+
+  const contents = response.body.map((blog: Blog) => blog.title);
+  expect(contents).toContain('React patterns');
 });
 
 describe('total likes', () => {
@@ -19,18 +50,18 @@ describe('total likes', () => {
       },
     ];
 
-    const result = listHelper.totalLikes(listWithOneBlog);
+    const result = helper.totalLikes(listWithOneBlog);
     expect(result).toBe(5);
   });
 
   test('of multiple blogs', () => {
-    const result = listHelper.totalLikes(listWithMultipleBlogs);
+    const result = helper.totalLikes(listWithMultipleBlogs);
     expect(result).toBe(36);
   });
 });
 
 test('favorite blog', () => {
-  const result = listHelper.favoriteBlog(listWithMultipleBlogs);
+  const result = helper.favoriteBlog(listWithMultipleBlogs);
   expect(result).toEqual({
     author: 'Edsger W. Dijkstra',
     likes: 12,
@@ -39,11 +70,11 @@ test('favorite blog', () => {
 });
 
 test('most blogs', () => {
-  const result = listHelper.mostBlogs(listWithMultipleBlogs);
+  const result = helper.mostBlogs(listWithMultipleBlogs);
   expect(result).toEqual({ name: 'Robert C. Martin', blogs: 3 });
 });
 
 test('most likes', () => {
-  const result = listHelper.mostLikes(listWithMultipleBlogs);
+  const result = helper.mostLikes(listWithMultipleBlogs);
   expect(result).toEqual({ name: 'Edsger W. Dijkstra', likes: 17 });
 });
