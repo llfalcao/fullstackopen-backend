@@ -1,4 +1,4 @@
-import { Blog } from '../models/Blog';
+import { Blog, BlogModel } from '../models/Blog';
 import { Note, NoteModel } from '../models/Note';
 
 const initialBlogs: Blog[] = [
@@ -31,7 +31,12 @@ const initialNotes: Note[] = [
 
 const notesInDb = async () => {
   const notes = await NoteModel.find({});
-  return notes.map((note) => note.toJSON({}));
+  return notes.map((note) => note.toJSON());
+};
+
+const blogsInDb = async () => {
+  const blogs = await BlogModel.find({});
+  return blogs.map((blog) => blog.toJSON());
 };
 
 const totalLikes = (blogs: Blog[]) =>
@@ -88,6 +93,7 @@ const mostLikes = (blogs: Blog[]) => {
 };
 
 const helper = {
+  blogsInDb,
   favoriteBlog,
   initialBlogs,
   initialNotes,
@@ -96,4 +102,5 @@ const helper = {
   notesInDb,
   totalLikes,
 };
+
 export default helper;

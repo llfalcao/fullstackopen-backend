@@ -39,6 +39,23 @@ test('a specific blog is within the returned blogs', async () => {
   expect(contents).toContain('React patterns');
 });
 
+test('a valid blog can be added', async () => {
+  const newBlog = {
+    title: 'Canonical string reduction',
+    author: 'Edsger W. Dijkstra',
+    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+    likes: 12,
+  };
+
+  await api.post('/api/blogs').send(newBlog).expect(201);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
+
+  const contents = blogsAtEnd.map((blog) => blog.title);
+  expect(contents).toContain('Canonical string reduction');
+});
+
 describe('total likes', () => {
   test('of one blog to be equal to their like count', () => {
     const listWithOneBlog: Blog[] = [
