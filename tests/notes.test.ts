@@ -8,9 +8,10 @@ const api = supertest(app);
 
 beforeEach(async () => {
   await NoteModel.deleteMany({});
-  const noteObjects = helper.initialNotes.map((note) => new NoteModel(note));
-  const promiseArray = noteObjects.map((note) => note.save());
-  await Promise.all(promiseArray);
+
+  for await (const note of helper.initialNotes) {
+    await new NoteModel(note).save();
+  }
 });
 
 test('notes are returned as json', async () => {
