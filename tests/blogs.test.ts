@@ -14,71 +14,75 @@ beforeEach(async () => {
   }
 });
 
-test('returns list of blogs', async () => {
-  const response = await api
-    .get('/api/blogs')
-    .expect('Content-Type', /application\/json/);
+describe('when there is initially a list of blogs', () => {
+  test('blogs are returned as json', async () => {
+    const response = await api
+      .get('/api/blogs')
+      .expect('Content-Type', /application\/json/);
 
-  expect(response.body).toHaveLength(helper.initialBlogs.length);
+    expect(response.body).toHaveLength(helper.initialBlogs.length);
+  });
+
+  test('a specific blog is within the returned blogs', async () => {
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+
+    const contents = response.body.map((blog: Blog) => blog.title);
+    expect(contents).toContain('React patterns');
+  });
+
+  test('the unique identifier is named "id"', async () => {
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+
+    expect(response.body[0].id).toBeDefined();
+  });
 });
 
-test('the unique identifier is named "id"', async () => {
-  const response = await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/);
+describe('addition of a new blog', () => {
+  test('succeeds with valid data', async () => {
+    const newBlog = {
+      title: 'Canonical string reduction',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+      likes: 12,
+    };
 
-  expect(response.body[0].id).toBeDefined();
-});
+    await api.post('/api/blogs').send(newBlog).expect(201);
 
-test('a specific blog is within the returned blogs', async () => {
-  const response = await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/);
+    const blogsAtEnd = await helper.blogsInDb();
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
 
-  const contents = response.body.map((blog: Blog) => blog.title);
-  expect(contents).toContain('React patterns');
-});
+    const contents = blogsAtEnd.map((blog) => blog.title);
+    expect(contents).toContain('Canonical string reduction');
+  });
 
-test('a valid blog can be added', async () => {
-  const newBlog = {
-    title: 'Canonical string reduction',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
-    likes: 12,
-  };
+  test('sets the "likes" count to zero by default if not specified', async () => {
+    const newBlog = {
+      title: 'First class tests',
+      author: 'Robert C. Martin',
+      url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
+    };
 
-  await api.post('/api/blogs').send(newBlog).expect(201);
+    await api.post('/api/blogs').send(newBlog);
 
-  const blogsAtEnd = await helper.blogsInDb();
-  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
+    const blogsAtEnd = await helper.blogsInDb();
+    const lastAdded = blogsAtEnd[blogsAtEnd.length - 1];
+    expect(lastAdded.likes).toEqual(0);
+  });
 
-  const contents = blogsAtEnd.map((blog) => blog.title);
-  expect(contents).toContain('Canonical string reduction');
-});
-
-test('missing property "likes" returns zero by default', async () => {
-  const newBlog = {
-    title: 'First class tests',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
-  };
-
-  await api.post('/api/blogs').send(newBlog);
-
-  const blogsAtEnd = await helper.blogsInDb();
-  const lastAdded = blogsAtEnd[blogsAtEnd.length - 1];
-  expect(lastAdded.likes).toEqual(0);
-});
-
-test('note missing title and url is rejected', async () => {
-  const newBlog = { author: 'Robert C. Martin' };
-  await api.post('/api/blogs').send(newBlog).expect(400);
+  test('fails with status code 400 with invalid data', async () => {
+    const newBlog = { author: 'Robert C. Martin' };
+    await api.post('/api/blogs').send(newBlog).expect(400);
+  });
 });
 
 describe('total likes', () => {
-  test('of one blog to be equal to their like count', () => {
+  test('of one blog are equal to their like count', () => {
     const listWithOneBlog: Blog[] = [
       {
         title: 'Go To Statement Considered Harmful',
@@ -98,21 +102,23 @@ describe('total likes', () => {
   });
 });
 
-test('favorite blog', () => {
-  const result = helper.favoriteBlog(listWithMultipleBlogs);
-  expect(result).toEqual({
-    author: 'Edsger W. Dijkstra',
-    likes: 12,
-    title: 'Canonical string reduction',
+describe('blog stats', () => {
+  test('favorite blog', () => {
+    const result = helper.favoriteBlog(listWithMultipleBlogs);
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 12,
+      title: 'Canonical string reduction',
+    });
   });
-});
 
-test('most blogs', () => {
-  const result = helper.mostBlogs(listWithMultipleBlogs);
-  expect(result).toEqual({ name: 'Robert C. Martin', blogs: 3 });
-});
+  test('most blogs', () => {
+    const result = helper.mostBlogs(listWithMultipleBlogs);
+    expect(result).toEqual({ name: 'Robert C. Martin', blogs: 3 });
+  });
 
-test('most likes', () => {
-  const result = helper.mostLikes(listWithMultipleBlogs);
-  expect(result).toEqual({ name: 'Edsger W. Dijkstra', likes: 17 });
+  test('most likes', () => {
+    const result = helper.mostLikes(listWithMultipleBlogs);
+    expect(result).toEqual({ name: 'Edsger W. Dijkstra', likes: 17 });
+  });
 });
