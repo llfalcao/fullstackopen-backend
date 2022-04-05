@@ -1,5 +1,6 @@
 import { Blog, BlogModel } from '../models/Blog';
 import { Note, NoteModel } from '../models/Note';
+import { Types } from 'mongoose';
 
 const initialBlogs: Blog[] = [
   {
@@ -28,6 +29,8 @@ const initialNotes: Note[] = [
     important: true,
   },
 ];
+
+const generateObjectId = () => new Types.ObjectId().toString();
 
 const notesInDb = async () => {
   const notes = await NoteModel.find({});
@@ -95,6 +98,7 @@ const mostLikes = (blogs: Blog[]) => {
 const helper = {
   blogsInDb,
   favoriteBlog,
+  generateObjectId,
   initialBlogs,
   initialNotes,
   mostBlogs,
