@@ -25,4 +25,12 @@ blogRouter.post('/', async (req, res) => {
   res.status(201).json(createdBlog);
 });
 
+// Delete blog
+blogRouter.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const deletedBlog = await BlogModel.findByIdAndDelete(id);
+  deletedBlog ? res.sendStatus(204) : res.sendStatus(404);
+});
+
 export default blogRouter;

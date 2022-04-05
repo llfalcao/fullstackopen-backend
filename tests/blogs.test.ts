@@ -81,6 +81,19 @@ describe('addition of a new blog', () => {
   });
 });
 
+describe('deleting a blog', () => {
+  test('succeeds with valid id', async () => {
+    const blogs = await helper.blogsInDb();
+    await api.delete(`/api/blogs/${blogs[0].id}`).expect(204);
+  });
+
+  // eslint-disable-next-line quotes
+  test("fails with status code 404 when it's not found", async () => {
+    const objectId = helper.generateObjectId();
+    await api.delete(`/api/blogs/${objectId}`).expect(404);
+  });
+});
+
 describe('total likes', () => {
   test('of one blog are equal to their like count', () => {
     const listWithOneBlog: Blog[] = [
