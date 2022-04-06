@@ -81,6 +81,33 @@ describe('addition of a new blog', () => {
   });
 });
 
+describe('updating a blog', () => {
+  test('succeeds with a valid id and data', async () => {
+    const blogs = await helper.blogsInDb();
+    const newData = { likes: 50 };
+
+    await api
+      .put(`/api/blogs/${blogs[0].id}`)
+      .send(newData)
+      .expect('Content-Type', /application\/json/);
+
+    const blogsAtEnd = await helper.blogsInDb();
+    const modifiedBlog = blogsAtEnd.find((b) => b.id === blogs[0].id);
+    expect(modifiedBlog?.likes).toBe(50);
+  });
+
+  test('fails with status code 400 with invalid id', async () => {
+    const newData = { likes: 3 };
+    await api.put('/api/blogs/12345').send(newData).expect(400);
+  });
+
+  test('fails with status code 404 if the note is not found', async () => {
+    const objectId = helper.generateObjectId();
+    const newData = { likes: 2 };
+    await api.put(`/api/blogs/${objectId}`).send(newData).expect(404);
+  });
+});
+
 describe('deleting a blog', () => {
   test('succeeds with valid id', async () => {
     const blogs = await helper.blogsInDb();
