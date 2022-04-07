@@ -2,23 +2,23 @@ import { Router } from 'express';
 import { Person, PersonModel } from '../models/Person';
 import { HydratedDocument } from 'mongoose';
 
-const personRouter = Router();
+const personsRouter = Router();
 
 // Get all people
-personRouter.get('/', async (req, res) => {
+personsRouter.get('/', async (req, res) => {
   const people = await PersonModel.find({});
   res.json(people);
 });
 
 // Get one person
-personRouter.get('/:id', async (req, res) => {
+personsRouter.get('/:id', async (req, res) => {
   const { id } = req.params;
   const person = await PersonModel.findById(id);
   person ? res.json(person) : res.sendStatus(404);
 });
 
 // Create person
-personRouter.post('/', async (req, res) => {
+personsRouter.post('/', async (req, res) => {
   const { name, number } = req.body;
   const isMatch = await PersonModel.findOne({ name });
 
@@ -32,7 +32,7 @@ personRouter.post('/', async (req, res) => {
 });
 
 // Update person
-personRouter.put('/:id', async (req, res) => {
+personsRouter.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { name, number } = req.body;
 
@@ -46,10 +46,10 @@ personRouter.put('/:id', async (req, res) => {
 });
 
 // Delete person
-personRouter.delete('/:id', async (req, res) => {
+personsRouter.delete('/:id', async (req, res) => {
   const { id } = req.params;
   const deletedPerson = await PersonModel.findByIdAndDelete({ _id: id });
   deletedPerson ? res.sendStatus(204) : res.sendStatus(404);
 });
 
-export default personRouter;
+export default personsRouter;

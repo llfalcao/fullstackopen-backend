@@ -1,0 +1,11 @@
+@url = http://localhost:8080
+@users = /api/users
+
+POST {{url}}{{users}}
+Content-Type: application/json
+
+{
+  "username": "faye",
+  "name": "Faye",
+  "password": "beyondTheWalls"
+}

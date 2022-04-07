@@ -2,23 +2,23 @@ import { Router } from 'express';
 import { Note, NoteModel } from '../models/Note';
 import { HydratedDocument } from 'mongoose';
 
-const noteRouter = Router();
+const notesRouter = Router();
 
 // Get all notes
-noteRouter.get('/', async (req, res) => {
+notesRouter.get('/', async (req, res) => {
   const notes = await NoteModel.find({});
   res.json(notes);
 });
 
 // Get one note
-noteRouter.get('/:id', async (req, res) => {
+notesRouter.get('/:id', async (req, res) => {
   const { id } = req.params;
   const note = await NoteModel.findById(id);
   note ? res.json(note) : res.sendStatus(404);
 });
 
 // Create note
-noteRouter.post('/', async (req, res) => {
+notesRouter.post('/', async (req, res) => {
   const { content, important } = req.body;
 
   const note: HydratedDocument<Note> = new NoteModel({
@@ -32,7 +32,7 @@ noteRouter.post('/', async (req, res) => {
 });
 
 // Update note
-noteRouter.put('/:id', async (req, res) => {
+notesRouter.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { content, important } = req.body;
 
@@ -46,10 +46,10 @@ noteRouter.put('/:id', async (req, res) => {
 });
 
 // Delete note
-noteRouter.delete('/:id', async (req, res) => {
+notesRouter.delete('/:id', async (req, res) => {
   const { id } = req.params;
   const deletedNote = await NoteModel.findByIdAndDelete(id);
   deletedNote ? res.sendStatus(204) : res.sendStatus(404);
 });
 
-export default noteRouter;
+export default notesRouter;
