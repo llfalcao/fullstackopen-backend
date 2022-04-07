@@ -1,5 +1,6 @@
 import { Blog, BlogModel } from '../models/Blog';
 import { Note, NoteModel } from '../models/Note';
+import { UserModel } from '../models/User';
 import { Types } from 'mongoose';
 
 const initialBlogs: Blog[] = [
@@ -40,6 +41,11 @@ const notesInDb = async () => {
 const blogsInDb = async () => {
   const blogs = await BlogModel.find({});
   return blogs.map((blog) => blog.toJSON());
+};
+
+const usersInDb = async () => {
+  const users = await UserModel.find({});
+  return users.map((user) => user.toJSON());
 };
 
 const totalLikes = (blogs: Blog[]) =>
@@ -105,6 +111,7 @@ const helper = {
   mostLikes,
   notesInDb,
   totalLikes,
+  usersInDb,
 };
 
 export default helper;
