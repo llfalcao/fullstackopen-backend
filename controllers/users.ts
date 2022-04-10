@@ -8,6 +8,14 @@ const usersRouter = Router();
 // Create user
 usersRouter.post('/', async (req, res) => {
   const { username, name, password } = req.body;
+
+  const existingUser = await UserModel.findOne({ username });
+  if (existingUser) {
+    return res.status(400).json({
+      error: 'Username must be unique',
+    });
+  }
+
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user: HydratedDocument<User> = new UserModel({

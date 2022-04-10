@@ -10,6 +10,7 @@ import config from './utils/config';
 import middlewares from './utils/middlewares';
 import logger from './utils/logger';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 const app = express();
