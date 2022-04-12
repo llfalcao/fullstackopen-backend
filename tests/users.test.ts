@@ -15,6 +15,15 @@ beforeEach(async () => {
   await user.save();
 });
 
+describe('when there is initially one user in the db', () => {
+  test('users are returned as json', async () => {
+    await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+  });
+});
+
 describe('creation of a new user', () => {
   test('succeeds with valid data', async () => {
     const usersAtStart = await helper.usersInDb();

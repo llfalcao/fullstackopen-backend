@@ -5,6 +5,12 @@ import { User, UserModel } from '../models/User';
 
 const usersRouter = Router();
 
+// Get users
+usersRouter.get('/', async (req, res) => {
+  const users = await UserModel.find({});
+  res.json(users);
+});
+
 // Create user
 usersRouter.post('/', async (req, res) => {
   const { username, name, password } = req.body;

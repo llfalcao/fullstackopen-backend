@@ -1,6 +1,9 @@
 @url = http://localhost:8080
 @users = /api/users
 
+GET {{url}}{{users}}
+
+###
 POST {{url}}{{users}}
 Content-Type: application/json
 
