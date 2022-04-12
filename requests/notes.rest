@@ -12,7 +12,8 @@ Content-Type: application/json
 
 {
   "content": "Keep coding",
-  "important": true
+  "important": true,
+  "userId": "6255f790bfb59fb57d2136f3"
 }
 
 ###

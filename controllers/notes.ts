@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { Note, NoteModel } from '../models/Note';
-import { HydratedDocument } from 'mongoose';
+import { NoteModel } from '../models/Note';
+import { UserModel } from '../models/User';
 
 const notesRouter = Router();
 
@@ -19,16 +19,21 @@ notesRouter.get('/:id', async (req, res) => {
 
 // Create note
 notesRouter.post('/', async (req, res) => {
-  const { content, important } = req.body;
+  const { content, important, userId } = req.body;
+  const user = await UserModel.findById(userId);
 
-  const note: HydratedDocument<Note> = new NoteModel({
-    date: new Date(),
+  const note = new NoteModel({
     content,
     important,
+    date: new Date(),
+    user: user._id,
   });
 
-  const createdNote = await note.save();
-  res.status(201).json(createdNote);
+  const savedNote = await note.save();
+  user.notes = user.notes.concat(savedNote._id);
+  await user.save();
+
+  res.status(201).json(savedNote);
 });
 
 // Update note

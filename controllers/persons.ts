@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import { Person, PersonModel } from '../models/Person';
-import { HydratedDocument } from 'mongoose';
+import { PersonModel } from '../models/Person';
 
 const personsRouter = Router();
 
@@ -26,7 +25,7 @@ personsRouter.post('/', async (req, res) => {
     return res.status(409).json({ error: 'Name must be unique' });
   }
 
-  const person: HydratedDocument<Person> = new PersonModel({ name, number });
+  const person = new PersonModel({ name, number });
   const createdPerson = await person.save();
   res.status(201).json(createdPerson);
 });
