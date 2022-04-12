@@ -6,7 +6,10 @@ const notesRouter = Router();
 
 // Get all notes
 notesRouter.get('/', async (req, res) => {
-  const notes = await NoteModel.find({});
+  const notes = await NoteModel.find({}).populate('user', {
+    username: 1,
+    name: 1,
+  });
   res.json(notes);
 });
 

@@ -7,7 +7,10 @@ const usersRouter = Router();
 
 // Get users
 usersRouter.get('/', async (req, res) => {
-  const users = await UserModel.find({}).populate('notes');
+  const users = await UserModel.find({}).populate('notes', {
+    content: 1,
+    date: 1,
+  });
   res.json(users);
 });
 
