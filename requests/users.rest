@@ -4,6 +4,9 @@
 GET {{url}}{{users}}
 
 ###
+GET {{url}}{{users}}/faye
+
+###
 POST {{url}}{{users}}
 Content-Type: application/json
 
