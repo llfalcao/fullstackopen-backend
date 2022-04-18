@@ -1,9 +1,10 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, ObjectId } from 'mongoose';
 
 export interface Note {
   content: string;
   date: Date;
   important: boolean;
+  user: ObjectId;
 }
 
 const noteSchema = new Schema({

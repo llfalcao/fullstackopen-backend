@@ -10,6 +10,7 @@ notesRouter.get('/', async (req, res) => {
     username: 1,
     name: 1,
   });
+
   res.json(notes);
 });
 

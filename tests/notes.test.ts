@@ -1,6 +1,8 @@
+import bcrypt from 'bcrypt';
 import supertest from 'supertest';
 import app from '../app';
 import { Note, NoteModel } from '../models/Note';
+import { UserModel } from '../models/User';
 import helper from './test_helper';
 
 const api = supertest(app);
@@ -34,8 +36,20 @@ describe('when there are initially notes saved', () => {
 });
 
 describe('addition of a new note', () => {
+  let userId: string;
+
+  beforeAll(async () => {
+    await UserModel.deleteMany({});
+
+    const passwordHash = await bcrypt.hash('onlyYmirKnows', 10);
+    const user = new UserModel({ username: 'root', passwordHash });
+
+    await user.save();
+    userId = user._id.toString();
+  });
+
   test('succeeds with valid data', async () => {
-    const newNote = { content: 'My soldiers, rage!', important: true };
+    const newNote = { content: 'My soldiers, rage!', important: true, userId };
 
     await api
       .post('/api/notes')
@@ -51,7 +65,7 @@ describe('addition of a new note', () => {
   });
 
   test('fails with status code 400 if the data is invalid', async () => {
-    const newNote = { content: '', important: true };
+    const newNote = { content: '', important: true, userId };
     await api.post('/api/notes').send(newNote).expect(400);
 
     const notesAtEnd = await helper.notesInDb();
