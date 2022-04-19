@@ -6,12 +6,10 @@ import notesRouter from './controllers/notes';
 import personsRouter from './controllers/persons';
 import blogsRouter from './controllers/blogs';
 import usersRouter from './controllers/users';
+import loginRouter from './controllers/login';
 import config from './utils/config';
 import middlewares from './utils/middlewares';
 import logger from './utils/logger';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const app = express();
 
@@ -23,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use(middlewares.requestLogger);
 
+app.use('/api/login', loginRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/persons', personsRouter);
 app.use('/api/blogs', blogsRouter);

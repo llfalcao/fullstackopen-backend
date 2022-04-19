@@ -1,0 +1,10 @@
+@url = http://localhost:8080
+@login = /api/login
+
+POST {{url}}{{login}}
+Content-Type: application/json
+
+{
+  "username": "clare",
+  "password": "num47"
+}
