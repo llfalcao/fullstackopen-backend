@@ -1,6 +1,14 @@
 import { Router } from 'express';
 import { NoteModel } from '../models/Note';
 import { UserModel } from '../models/User';
+import { Request } from 'express';
+import jwt from 'jsonwebtoken';
+
+declare const process: {
+  env: {
+    SECRET: string;
+  };
+};
 
 const notesRouter = Router();
 
@@ -21,11 +29,33 @@ notesRouter.get('/:id', async (req, res) => {
   note ? res.json(note) : res.sendStatus(404);
 });
 
+// Get authorization
+const getTokenFrom = (request: Request) => {
+  const authorization = request.headers.authorization;
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    return authorization.substring(7);
+  }
+  return null;
+};
+
 // Create note
 notesRouter.post('/', async (req, res) => {
-  const { content, important, userId } = req.body;
-  const user = await UserModel.findById(userId);
+  const { content, important } = req.body;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const token = getTokenFrom(req);
+  if (!token) {
+    return res.status(401).json({ error: 'Token is missing or invalid' });
+  }
 
+  console.log(token);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const decodedToken: any = jwt.verify(token, process.env.SECRET);
+
+  if (!decodedToken.id) {
+    return res.status(401).json({ error: 'Token is missing or invalid' });
+  }
+
+  const user = await UserModel.findById(decodedToken.id);
   const note = new NoteModel({
     content,
     important,
