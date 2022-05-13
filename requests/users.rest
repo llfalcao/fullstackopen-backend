@@ -15,3 +15,12 @@ Content-Type: application/json
   "name": "Faye",
   "password": "beyondTheWalls"
 }
+
+###
+POST {{url}}{{users}}
+Content-Type: application/json
+
+{
+  "username": "whatisapassword",
+  "name": "HTTP Four Hundred"
+}

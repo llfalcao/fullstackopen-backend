@@ -9,7 +9,10 @@ export interface User {
 }
 
 const UserSchema = new Schema({
-  username: String,
+  username: {
+    type: String,
+    required: [true, 'Username required'],
+  },
   name: String,
   passwordHash: String,
   notes: [

@@ -27,13 +27,14 @@ usersRouter.post('/', async (req, res) => {
 
   const existingUser = await UserModel.findOne({ username });
   if (existingUser) {
-    return res.status(400).json({
-      error: 'Username must be unique',
-    });
+    return res.status(400).json({ error: 'Username must be unique' });
+  }
+
+  if (!password) {
+    return res.status(400).json({ error: 'Password required' });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-
   const user: HydratedDocument<User> = new UserModel({
     username,
     name,
