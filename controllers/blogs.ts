@@ -1,24 +1,26 @@
 import { Router } from 'express';
 import { Blog, BlogModel } from '../models/Blog';
 import { HydratedDocument } from 'mongoose';
+import { UserModel } from '../models/User';
 
 const blogsRouter = Router();
 
 // Get all blogs
 blogsRouter.get('/', async (req, res) => {
-  const blogs = await BlogModel.find({});
+  const blogs = await BlogModel.find({}).populate('user', { notes: 0 });
   res.json(blogs);
 });
 
 // Create blog
 blogsRouter.post('/', async (req, res) => {
   const { title, author, url, likes } = req.body;
-
+  const user = await UserModel.findOne();
   const blog: HydratedDocument<Blog> = new BlogModel({
     title,
     author,
     url,
     likes,
+    user: user._id,
   });
 
   const createdBlog = await blog.save();

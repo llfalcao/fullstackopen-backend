@@ -9,5 +9,7 @@ Content-Type: application/json
 
 {
   "author": "llfalcao",
-  "likes": 15694
+  "likes": 15694,
+  "title": "Backend Magic",
+  "url": "backendmagic.com"
 }

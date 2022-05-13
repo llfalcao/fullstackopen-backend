@@ -1,10 +1,11 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, ObjectId } from 'mongoose';
 
 export interface Blog {
   title: string;
   author: string;
   url: string;
   likes: number;
+  user: ObjectId;
 }
 
 const blogSchema = new Schema({
@@ -15,6 +16,10 @@ const blogSchema = new Schema({
   author: {
     type: String,
     required: [true, 'Author required'],
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
   },
   url: {
     type: String,
