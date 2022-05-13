@@ -60,4 +60,17 @@ describe('creation of a new user', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/);
   });
+
+  test('fails with status code 400 if there is no password', async () => {
+    const newUser = {
+      username: 'passwordfree',
+      name: 'Jiyuu',
+    };
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+  });
 });
