@@ -21,18 +21,15 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     if (error.path === '_id') {
       error.message = 'Invalid ID format';
     }
-
     return res.status(400).json({ error: error.message });
   }
 
   if (error.name === 'ValidationError') {
-    const errors: { [key in string]: string } = {};
-
+    const errorObject: { [key in string]: string } = {};
     Object.keys(error.errors).forEach(
-      (key) => (errors[key] = error.errors[key].message),
+      (key) => (errorObject[key] = error.errors[key].message),
     );
-
-    return res.status(400).json({ errors });
+    return res.status(400).json({ errors: errorObject });
   }
 
   if (error.name === 'JsonWebTokenError') {
@@ -47,5 +44,19 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   next(error);
 };
 
-const middlewares = { requestLogger, unknownEndpoint, errorHandler };
+const tokenExtractor = (request: Request) => {
+  const authorization = request.headers.authorization;
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    return authorization.substring(7);
+  }
+  return null;
+};
+
+const middlewares = {
+  errorHandler,
+  requestLogger,
+  tokenExtractor,
+  unknownEndpoint,
+};
+
 export default middlewares;

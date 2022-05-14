@@ -24,6 +24,9 @@ blogsRouter.post('/', async (req, res) => {
   });
 
   const createdBlog = await blog.save();
+  user.blogs = user.blogs.concat(blog);
+  await user.save();
+
   res.status(201).json(createdBlog);
 });
 

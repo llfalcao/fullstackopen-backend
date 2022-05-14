@@ -8,7 +8,7 @@ POST {{url}}{{blogs}}
 Content-Type: application/json
 
 {
-  "author": "llfalcao",
+  "author": "faye",
   "likes": 15694,
   "title": "Backend Magic",
   "url": "backendmagic.com"
