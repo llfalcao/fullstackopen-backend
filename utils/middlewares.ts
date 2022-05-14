@@ -44,12 +44,13 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   next(error);
 };
 
-const tokenExtractor = (request: Request) => {
-  const authorization = request.headers.authorization;
+const tokenExtractor = (req: Request, res: Response, next: NextFunction) => {
+  const authorization = req.headers.authorization;
+
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    return authorization.substring(7);
+    req.token = authorization.substring(7);
   }
-  return null;
+  next();
 };
 
 const middlewares = {

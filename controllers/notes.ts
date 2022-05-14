@@ -2,13 +2,12 @@ import { Router } from 'express';
 import { NoteModel } from '../models/Note';
 import { UserModel } from '../models/User';
 import jwt from 'jsonwebtoken';
-import middlewares from '../utils/middlewares';
 
-declare const process: {
-  env: {
-    SECRET: string;
-  };
-};
+// declare const process: {
+//   env: {
+//     SECRET: string;
+//   };
+// };
 
 const notesRouter = Router();
 
@@ -32,13 +31,17 @@ notesRouter.get('/:id', async (req, res) => {
 // Create note
 notesRouter.post('/', async (req, res) => {
   const { content, important } = req.body;
-  const token = middlewares.tokenExtractor(req);
-  if (!token) {
+
+  if (!req.token) {
     return res.status(401).json({ error: 'Token is missing or invalid' });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const decodedToken: any = jwt.verify(token, process.env.SECRET);
+  console.log(req.token);
+  const decodedToken = jwt.verify(req.token, process.env.SECRET) as {
+    id: string;
+    username: string;
+  };
+  console.log(decodedToken);
 
   if (!decodedToken.id) {
     return res.status(401).json({ error: 'Token is missing or invalid' });
