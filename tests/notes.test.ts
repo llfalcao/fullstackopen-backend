@@ -5,6 +5,12 @@ import { Note, NoteModel } from '../models/Note';
 import { UserModel } from '../models/User';
 import helper from './test_helper';
 
+interface Token {
+  token: string;
+  username: string;
+  name?: string;
+}
+
 const api = supertest(app);
 
 beforeEach(async () => {
@@ -36,7 +42,7 @@ describe('when there are initially notes saved', () => {
 });
 
 describe('addition of a new note', () => {
-  let userId: string;
+  let token: Token;
 
   beforeAll(async () => {
     await UserModel.deleteMany({});
@@ -45,14 +51,19 @@ describe('addition of a new note', () => {
     const user = new UserModel({ username: 'root', passwordHash });
 
     await user.save();
-    userId = user._id.toString();
+
+    const response = await supertest(app)
+      .post('/api/login')
+      .send({ username: 'root', password: 'onlyYmirKnows' });
+    token = response.body.token;
   });
 
   test('succeeds with valid data', async () => {
-    const newNote = { content: 'My soldiers, rage!', important: true, userId };
+    const newNote = { content: 'My soldiers, rage!', important: true };
 
     await api
       .post('/api/notes')
+      .set('Authorization', `Bearer ${token}`)
       .send(newNote)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -65,8 +76,12 @@ describe('addition of a new note', () => {
   });
 
   test('fails with status code 400 if the data is invalid', async () => {
-    const newNote = { content: '', important: true, userId };
-    await api.post('/api/notes').send(newNote).expect(400);
+    const newNote = { content: '', important: true };
+    await api
+      .post('/api/notes')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newNote)
+      .expect(400);
 
     const notesAtEnd = await helper.notesInDb();
     expect(notesAtEnd).toHaveLength(helper.initialNotes.length);

@@ -36,12 +36,10 @@ notesRouter.post('/', async (req, res) => {
     return res.status(401).json({ error: 'Token is missing or invalid' });
   }
 
-  console.log(req.token);
   const decodedToken = jwt.verify(req.token, process.env.SECRET) as {
     id: string;
     username: string;
   };
-  console.log(decodedToken);
 
   if (!decodedToken.id) {
     return res.status(401).json({ error: 'Token is missing or invalid' });
