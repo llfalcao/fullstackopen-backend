@@ -73,4 +73,30 @@ describe('creation of a new user', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/);
   });
+
+  test('fails with status code 400 if the username has less than 3 characters', async () => {
+    const newUser = {
+      username: 'gg',
+      password: 'validPassword',
+    };
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+  });
+
+  test('fails with status code 400 if the password has less than 3 characters', async () => {
+    const newUser = {
+      username: 'itsue',
+      password: 'jp',
+    };
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+  });
 });
