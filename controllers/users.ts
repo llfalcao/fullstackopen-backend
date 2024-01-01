@@ -5,14 +5,24 @@ import { User, UserModel } from '../models/User';
 
 const usersRouter = Router();
 
+const noteFields = {
+  content: 1,
+  date: 1,
+};
+
+const blogFields = {
+  id: 1,
+  url: 1,
+  title: 1,
+  author: 1,
+};
+
 // Get users
-usersRouter.get('/', async (req, res) => {
+usersRouter.get('/', async (_, res) => {
   const users = await UserModel.find({})
-    .populate('notes', {
-      content: 1,
-      date: 1,
-    })
-    .populate('blogs');
+    .populate('notes', noteFields)
+    .populate('blogs', blogFields);
+
   res.json(users);
 });
 
@@ -20,11 +30,9 @@ usersRouter.get('/', async (req, res) => {
 usersRouter.get('/:username', async (req, res) => {
   const { username } = req.params;
   const user = await UserModel.findOne({ username })
-    .populate('notes', {
-      content: 1,
-      date: 1,
-    })
-    .populate('blogs');
+    .populate('notes', noteFields)
+    .populate('blogs', blogFields);
+
   user ? res.json(user) : res.status(404).json('User not found');
 });
 
