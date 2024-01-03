@@ -13,8 +13,6 @@ module.exports = {
   rules: {
     indent: ['error', 2, { ignoredNodes: ['TemplateLiteral > *'] }],
     'linebreak-style': ['error', 'unix'],
-
-    quotes: ['error', 'single'],
     semi: ['error', 'always'],
     eqeqeq: 'error',
     'no-console': 0,

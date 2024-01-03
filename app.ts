@@ -21,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use(middlewares.requestLogger);
 app.use(middlewares.tokenExtractor);
+app.use(middlewares.userExtractor);
 
 app.use('/api/login', loginRouter);
 app.use('/api/notes', notesRouter);

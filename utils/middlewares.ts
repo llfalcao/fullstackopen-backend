@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import morgan from 'morgan';
 import logger from './logger';
+import jwt from 'jsonwebtoken';
 
 const requestLogger = [
   (req: Request, res: Response, next: NextFunction) => {
@@ -44,12 +45,32 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   next(error);
 };
 
-const tokenExtractor = (req: Request, res: Response, next: NextFunction) => {
+const tokenExtractor = (req: Request, _res: Response, next: NextFunction) => {
   const authorization = req.headers.authorization;
 
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     req.token = authorization.substring(7);
   }
+
+  next();
+};
+
+const userExtractor = (req: Request, _res: Response, next: NextFunction) => {
+  const token = req.token;
+
+  if (!token) {
+    return next();
+  }
+
+  const user = jwt.verify(token, process.env.SECRET) as {
+    id: string;
+    username: string;
+  };
+
+  if (user) {
+    req.user = user;
+  }
+
   next();
 };
 
@@ -57,6 +78,7 @@ const middlewares = {
   errorHandler,
   requestLogger,
   tokenExtractor,
+  userExtractor,
   unknownEndpoint,
 };
 

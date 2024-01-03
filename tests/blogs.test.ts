@@ -1,17 +1,45 @@
+import mongoose from 'mongoose';
 import supertest from 'supertest';
 import app from '../app';
-import { Blog, BlogModel } from '../models/Blog';
-import helper from '../tests/test_helper';
 import listWithMultipleBlogs from '../db/blogs.json';
+import { Blog, BlogModel } from '../models/Blog';
+import { UserModel } from '../models/User';
+import helper, {
+  createUser,
+  generateInvalidToken,
+  generateToken,
+  Login,
+} from '../tests/test_helper';
+
+interface Token {
+  token: Token;
+  username: string;
+  name?: string;
+}
+
+interface User extends Login {
+  id: mongoose.Types.ObjectId;
+}
 
 const api = supertest(app);
+let user: User;
+
+beforeAll(async () => {
+  await UserModel.deleteMany({});
+  user = await createUser({
+    username: 'root',
+    password: 'onlyYmirKnows',
+  });
+});
 
 beforeEach(async () => {
   await BlogModel.deleteMany({});
 
-  for await (const blog of helper.initialBlogs) {
-    await new BlogModel(blog).save();
-  }
+  await Promise.all(
+    helper.initialBlogs.map(async (blog) => {
+      await new BlogModel({ ...blog, user: user.id }).save();
+    }),
+  );
 });
 
 describe('when there is initially a list of blogs', () => {
@@ -44,6 +72,12 @@ describe('when there is initially a list of blogs', () => {
 });
 
 describe('addition of a new blog', () => {
+  let token: Token;
+
+  beforeAll(async () => {
+    token = await generateToken();
+  });
+
   test('succeeds with valid data', async () => {
     const newBlog = {
       title: 'Canonical string reduction',
@@ -52,7 +86,12 @@ describe('addition of a new blog', () => {
       likes: 12,
     };
 
-    await api.post('/api/blogs').send(newBlog).expect(201);
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
 
     const blogsAtEnd = await helper.blogsInDb();
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
@@ -68,27 +107,53 @@ describe('addition of a new blog', () => {
       url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
     };
 
-    await api.post('/api/blogs').send(newBlog);
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(201);
 
     const blogsAtEnd = await helper.blogsInDb();
     const lastAdded = blogsAtEnd[blogsAtEnd.length - 1];
     expect(lastAdded.likes).toEqual(0);
   });
 
+  test('fails with status 401 with missing credentials', async () => {
+    const newBlog = {
+      title: 'First class tests',
+      author: 'Robert C. Martin',
+      url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
+    };
+    await api.post('/api/blogs').send(newBlog).expect(401);
+  });
+
   test('fails with status code 400 with invalid data', async () => {
     const newBlog = { author: 'Robert C. Martin' };
-    await api.post('/api/blogs').send(newBlog).expect(400);
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(400);
   });
 });
 
 describe('updating a blog', () => {
+  let token: Token;
+
+  beforeAll(async () => {
+    token = await generateToken();
+  });
+
   test('succeeds with a valid id and data', async () => {
     const blogs = await helper.blogsInDb();
     const newData = { likes: 50 };
 
     await api
       .put(`/api/blogs/${blogs[0].id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(newData)
+      .expect(200)
       .expect('Content-Type', /application\/json/);
 
     const blogsAtEnd = await helper.blogsInDb();
@@ -96,34 +161,86 @@ describe('updating a blog', () => {
     expect(modifiedBlog?.likes).toBe(50);
   });
 
-  test('fails with status code 400 with invalid id', async () => {
+  test('fails with status code 400 with invalid id format', async () => {
     const newData = { likes: 3 };
-    await api.put('/api/blogs/12345').send(newData).expect(400);
+    await api
+      .put('/api/blogs/12345')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newData)
+      .expect(400);
   });
 
-  test('fails with status code 404 if the note is not found', async () => {
+  test('fails with status 401 with missing credentials', async () => {
+    const blogs = await helper.blogsInDb();
+    const newData = { likes: 10 };
+    await api.put(`/api/blogs/${blogs[0].id}`).send(newData).expect(401);
+  });
+
+  test('fails with status 401 with invalid credentials', async () => {
+    const blogs = await helper.blogsInDb();
+    const newData = { likes: 10 };
+    const invalidToken = await generateInvalidToken();
+
+    await api
+      .put(`/api/blogs/${blogs[0].id}`)
+      .set('Authorization', `Bearer ${invalidToken}`)
+      .send(newData)
+      .expect(401);
+  });
+
+  test('fails with status code 404 if the blog is not found', async () => {
     const objectId = helper.generateObjectId();
     const newData = { likes: 2 };
-    await api.put(`/api/blogs/${objectId}`).send(newData).expect(404);
+    await api
+      .put(`/api/blogs/${objectId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(newData)
+      .expect(404);
   });
 });
 
 describe('deleting a blog', () => {
-  test('succeeds with valid id', async () => {
-    const blogs = await helper.blogsInDb();
-    await api.delete(`/api/blogs/${blogs[0].id}`).expect(204);
+  let token: Token;
+
+  beforeAll(async () => {
+    token = await generateToken();
   });
 
-  // eslint-disable-next-line quotes
+  test('succeeds with valid id', async () => {
+    const blogs = await helper.blogsInDb();
+    await api
+      .delete(`/api/blogs/${blogs[0].id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(204);
+  });
+
+  test('fails with status 401 with missing credentials', async () => {
+    const blogs = await helper.blogsInDb();
+    await api.delete(`/api/blogs/${blogs[0].id}`).expect(401);
+  });
+
+  test('fails with status 401 with invalid credentials', async () => {
+    const blogs = await helper.blogsInDb();
+    const invalidToken = await generateInvalidToken();
+
+    await api
+      .delete(`/api/blogs/${blogs[0].id}`)
+      .set('Authorization', `Bearer ${invalidToken}`)
+      .expect(401);
+  });
+
   test("fails with status code 404 when it's not found", async () => {
     const objectId = helper.generateObjectId();
-    await api.delete(`/api/blogs/${objectId}`).expect(404);
+    await api
+      .delete(`/api/blogs/${objectId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(404);
   });
 });
 
 describe('total likes', () => {
   test('of one blog are equal to their like count', () => {
-    const listWithOneBlog: Blog[] = [
+    const listWithOneBlog = [
       {
         title: 'Go To Statement Considered Harmful',
         author: 'Edsger W. Dijkstra',

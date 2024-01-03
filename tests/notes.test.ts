@@ -49,12 +49,12 @@ describe('addition of a new note', () => {
 
     const passwordHash = await bcrypt.hash('onlyYmirKnows', 10);
     const user = new UserModel({ username: 'root', passwordHash });
-
     await user.save();
 
     const response = await supertest(app)
       .post('/api/login')
       .send({ username: 'root', password: 'onlyYmirKnows' });
+
     token = response.body.token;
   });
 

@@ -12,7 +12,7 @@ import jwt from 'jsonwebtoken';
 const notesRouter = Router();
 
 // Get all notes
-notesRouter.get('/', async (_, res) => {
+notesRouter.get('/', async (_req, res) => {
   const notes = await NoteModel.find({}).populate('user', {
     username: 1,
     name: 1,

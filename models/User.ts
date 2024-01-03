@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { Blog } from './Blog';
 import { Note } from './Note';
 
 export interface User {
@@ -6,6 +7,7 @@ export interface User {
   name: string;
   passwordHash: string;
   notes: Note[];
+  blogs: Blog[];
 }
 
 const UserSchema = new Schema({
@@ -38,4 +40,4 @@ UserSchema.set('toJSON', {
   },
 });
 
-export const UserModel = model('User', UserSchema);
+export const UserModel = model<User>('User', UserSchema);
