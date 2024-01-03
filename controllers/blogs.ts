@@ -6,7 +6,7 @@ import { UserModel } from '../models/User';
 const blogsRouter = Router();
 
 // Get all blogs
-blogsRouter.get('/', async (_, res) => {
+blogsRouter.get('/', async (_req, res) => {
   const blogs = await BlogModel.find({}).populate('user', {
     notes: 0,
     blogs: 0,

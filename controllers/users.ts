@@ -18,7 +18,7 @@ const blogFields = {
 };
 
 // Get users
-usersRouter.get('/', async (_, res) => {
+usersRouter.get('/', async (_req, res) => {
   const users = await UserModel.find({})
     .populate('notes', noteFields)
     .populate('blogs', blogFields);

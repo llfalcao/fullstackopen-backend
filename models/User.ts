@@ -32,7 +32,7 @@ const UserSchema = new Schema({
 });
 
 UserSchema.set('toJSON', {
-  transform: (_, returnedObject) => {
+  transform: (_document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
     delete returnedObject.__v;
