@@ -55,11 +55,11 @@ const tokenExtractor = (req: Request, _res: Response, next: NextFunction) => {
   next();
 };
 
-const userExtractor = (req: Request, _res: Response, next: NextFunction) => {
+const userExtractor = (req: Request, res: Response, next: NextFunction) => {
   const token = req.token;
 
   if (!token) {
-    return next();
+    return res.status(401).json({ error: 'Token is missing or invalid' });
   }
 
   const user = jwt.verify(token, process.env.SECRET) as {
@@ -67,10 +67,7 @@ const userExtractor = (req: Request, _res: Response, next: NextFunction) => {
     username: string;
   };
 
-  if (user) {
-    req.user = user;
-  }
-
+  req.user = user;
   next();
 };
 

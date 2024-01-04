@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Blog, BlogModel } from '../models/Blog';
 import { HydratedDocument } from 'mongoose';
 import { UserModel } from '../models/User';
+import middlewares from '../utils/middlewares';
 
 const blogsRouter = Router();
 
@@ -16,12 +17,14 @@ blogsRouter.get('/', async (_req, res) => {
 });
 
 // Create blog
-blogsRouter.post('/', async (req, res) => {
+blogsRouter.post('/', middlewares.userExtractor, async (req, res) => {
   const { title, author, url, likes } = req.body;
   const { user } = req;
 
-  if (!user) {
-    return res.status(401).json({ error: 'Token is missing or invalid' });
+  const userData = await UserModel.findById(user?.id);
+
+  if (!userData) {
+    return res.status(404).json({ error: 'User not found' });
   }
 
   const blog: HydratedDocument<Blog> = new BlogModel({
@@ -29,14 +32,8 @@ blogsRouter.post('/', async (req, res) => {
     author,
     url,
     likes,
-    user: user.id,
+    user: user?.id,
   });
-
-  const userData = await UserModel.findById(user.id);
-
-  if (!userData) {
-    return res.status(404).json({ error: 'User not found' });
-  }
 
   const createdBlog = await blog.save();
   userData.blogs = userData.blogs.concat(blog);
@@ -46,19 +43,14 @@ blogsRouter.post('/', async (req, res) => {
 });
 
 // Update blog
-blogsRouter.put('/:id', async (req, res) => {
+blogsRouter.put('/:id', middlewares.userExtractor, async (req, res) => {
   const { id } = req.params;
   const { title, author, url, likes } = req.body;
   const { user } = req;
-
-  if (!user) {
-    return res.status(401).json({ error: 'Token is missing or invalid' });
-  }
-
   const blog = await BlogModel.findById(id, 'user');
   const userId = blog?.user.toString();
 
-  if (blog && userId !== user.id) {
+  if (blog && userId !== user?.id) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -72,18 +64,13 @@ blogsRouter.put('/:id', async (req, res) => {
 });
 
 // Delete blog
-blogsRouter.delete('/:id', async (req, res) => {
+blogsRouter.delete('/:id', middlewares.userExtractor, async (req, res) => {
   const { id } = req.params;
   const { user } = req;
-
-  if (!user) {
-    return res.status(401).json({ error: 'Token is missing or invalid' });
-  }
-
   const blog = await BlogModel.findById(id, 'user');
   const userId = blog?.user.toString();
 
-  if (blog && userId !== user.id) {
+  if (blog && userId !== user?.id) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

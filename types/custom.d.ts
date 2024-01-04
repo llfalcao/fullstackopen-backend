@@ -1,7 +1,7 @@
 declare namespace Express {
   export interface Request {
     token?: string;
-    user?: {
+    user: {
       id: string;
       username: string;
     };

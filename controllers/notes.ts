@@ -1,13 +1,7 @@
 import { Router } from 'express';
 import { NoteModel } from '../models/Note';
 import { UserModel } from '../models/User';
-import jwt from 'jsonwebtoken';
-
-// declare const process: {
-//   env: {
-//     SECRET: string;
-//   };
-// };
+import middlewares from '../utils/middlewares';
 
 const notesRouter = Router();
 
@@ -29,41 +23,40 @@ notesRouter.get('/:id', async (req, res) => {
 });
 
 // Create note
-notesRouter.post('/', async (req, res) => {
+notesRouter.post('/', middlewares.userExtractor, async (req, res) => {
   const { content, important } = req.body;
+  const { user } = req;
+  const userData = await UserModel.findById(user.id);
 
-  if (!req.token) {
-    return res.status(401).json({ error: 'Token is missing or invalid' });
+  if (!userData) {
+    return res.status(404).json({ error: 'User not found' });
   }
 
-  const decodedToken = jwt.verify(req.token, process.env.SECRET) as {
-    id: string;
-    username: string;
-  };
-
-  if (!decodedToken.id) {
-    return res.status(401).json({ error: 'Token is missing or invalid' });
-  }
-
-  const user = await UserModel.findById(decodedToken.id);
   const note = new NoteModel({
     content,
     important,
     date: new Date(),
-    user: user._id,
+    user: userData?._id,
   });
 
   const savedNote = await note.save();
-  user.notes = user.notes.concat(savedNote._id);
-  await user.save();
+  userData.notes = userData.notes.concat(savedNote);
+  await userData.save();
 
   res.status(201).json(savedNote);
 });
 
 // Update note
-notesRouter.put('/:id', async (req, res) => {
+notesRouter.put('/:id', middlewares.userExtractor, async (req, res) => {
   const { id } = req.params;
   const { content, important } = req.body;
+  const { user } = req;
+  const note = await NoteModel.findById(id, 'user');
+  const userId = note?.user.toString();
+
+  if (note && userId !== user?.id) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 
   const updatedNote = await NoteModel.findByIdAndUpdate(
     id,
@@ -75,8 +68,16 @@ notesRouter.put('/:id', async (req, res) => {
 });
 
 // Delete note
-notesRouter.delete('/:id', async (req, res) => {
+notesRouter.delete('/:id', middlewares.userExtractor, async (req, res) => {
   const { id } = req.params;
+  const { user } = req;
+  const note = await NoteModel.findById(id, 'user');
+  const userId = note?.user.toString();
+
+  if (note && userId !== user?.id) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const deletedNote = await NoteModel.findByIdAndDelete(id);
   deletedNote ? res.sendStatus(204) : res.sendStatus(404);
 });
